@@ -8,7 +8,7 @@
       "i18n": true,
       "i18next": true,
       "sgc": true,
-      "lineChart": true,
+      "chordChart": true,
       "wb": true
     },
     "extends": "eslint:recommended",
