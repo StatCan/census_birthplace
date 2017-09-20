@@ -14,7 +14,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   showData = function() {
     chordChart(chart, settings);
   },
-  sgcData, countriesData, birthplaceData;
+  countriesData, birthplaceData, sgcFormatter;
 
 i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
   d3.queue()
@@ -22,7 +22,7 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
     .defer(d3.json, countriesDataUrl)
     .defer(d3.json, birthplaceDataUrl)
     .await(function(error, sgcs, countries, birthplace) {
-      sgcData = sgcs;
+      sgcFormatter = sgc.getFormatter(sgcs);
       countriesData = statcan_countries(countries);
 
       showData();
