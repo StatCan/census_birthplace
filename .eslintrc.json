@@ -8,10 +8,14 @@
       "i18n": true,
       "i18next": true,
       "sgc": true,
+      "statcan_countries": true,
       "chordChart": true,
       "wb": true
     },
     "extends": "eslint:recommended",
+    "parserOptions": {
+      "ecmaVersion": 6
+    },
     "rules": {
         "indent": [
             "error",
