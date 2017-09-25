@@ -20,6 +20,8 @@ this.chordChart = function(svg, settings) {
     innerWidth = mergedSettings.innerWidth = outerWidth - mergedSettings.margin.left - mergedSettings.margin.right,
     chartInner = svg.select("g"),
     dataLayer = chartInner.select(".data"),
+    transition = d3.transition()
+      .duration(1000),
     draw = function() {
       var sett = this.settings,
         data = (sett.filterData && typeof sett.filterData === "function") ?
@@ -42,6 +44,22 @@ this.chordChart = function(svg, settings) {
           }
           return newD;
         },
+        arcTween = function(d) {
+          var i = d3.interpolate(this._current, d);
+          this._current = i(0);
+
+          return function(t) {
+            return arc(i(t));
+          };
+        },
+        ribbonTween = function(d) {
+          var i = d3.interpolate(this._current, d);
+          this._current = i(0);
+
+          return function(t) {
+            return ribbon(i(t));
+          };
+        },
         chord = d3.chord()
           .padAngle(sett.padding),
         arc = d3.arc()
@@ -49,6 +67,8 @@ this.chordChart = function(svg, settings) {
           .outerRadius(outerRadius),
         ribbon = d3.ribbon()
           .radius(innerRadius),
+        arcsGroup = dataLayer.select(".arcs"),
+        ribbonsGroup = dataLayer.select(".ribbons"),
         arcs, ribbons;
 
       if (sett.startAngle) {
@@ -68,11 +88,21 @@ this.chordChart = function(svg, settings) {
       }
       dataLayer.datum(mapIndexes(sett.getMatrix.call(sett, data)));
 
-
-      arcs = dataLayer.append("g")
-        .attr("class", "arcs")
+      if (arcsGroup.empty()) {
+        arcsGroup = dataLayer.append("g")
+          .attr("class", "arcs");
+      }
+      arcs = arcsGroup
         .selectAll("g")
         .data(function(chords) { return chords.groups; });
+
+      if (ribbonsGroup.empty()) {
+        ribbonsGroup = dataLayer.append("g")
+          .attr("class", "ribbons");
+      }
+      ribbons = ribbonsGroup
+        .selectAll("g")
+        .data(function(chords) { return chords; });
 
       arcs
         .enter()
@@ -83,10 +113,17 @@ this.chordChart = function(svg, settings) {
               .attr("d", arc);
           });
 
-      ribbons = dataLayer.append("g")
-        .attr("class", "ribbons")
-        .selectAll("g")
-        .data(function(chords) { return chords; });
+      arcs
+        .attr("class", sett.arcs ? sett.arcs.getClass.bind(sett) : null)
+        .each(function() {
+          d3.select(this).select("path")
+            .transition(transition)
+            .attrTween("d", arcTween);
+        });
+
+      arcs
+        .exit()
+        .remove();
 
       ribbons
         .enter()
@@ -96,6 +133,18 @@ this.chordChart = function(svg, settings) {
             d3.select(this).append("path")
               .attr("d", ribbon);
           });
+
+      ribbons
+        .attr("class", sett.ribbons ? sett.ribbons.getClass.bind(sett) : null)
+        .each(function() {
+          d3.select(this).select("path")
+            .transition(transition)
+            .attrTween("d", ribbonTween);
+        });
+
+      ribbons
+        .exit()
+        .remove();
 
     },
     rtnObj, process;
