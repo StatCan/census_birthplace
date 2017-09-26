@@ -61,6 +61,16 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         return d.sgcId;
       }
     },
+    arcs: {
+      getClass: function(d) {
+        return d.index;
+      }
+    },
+    ribbons: {
+      getClass: function(d) {
+        return "sgc_" + d.target.index;
+      }
+    },
     startAngle: getAngleFn("startAngle"),
     endAngle: getAngleFn("endAngle"),
     getPointValue: function() {
