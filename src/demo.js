@@ -17,6 +17,35 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   rootI18nNs = "census_birthplace",
   canadaSgc = "01",
   settings = {
+    filterData: function(data) {
+      var to = this.to.type,
+        from = this.from.type;
+      return data.filter(function(d) {
+        var fromTrue = false,
+          toTrue = false,
+          toCanada = settings.to.getValue.call(settings, d) === canadaSgc,
+          toProvince = sgc.sgc.isProvince(settings.to.getValue.call(settings, d)),
+          fromId = settings.from.getValue.call(settings, d),
+          fromRegion = countriesData.isRegion(fromId),
+          fromCountry = countriesData.isCountry(fromId);
+        if (
+          (to === TO_CANADA && toCanada) ||
+          (to === TO_PT && toProvince) ||
+          (to === TO_CMA && !toCanada && !toProvince)
+        )
+          toTrue = true;
+
+
+        if (
+          (from === FROM_CONTINENTS) ||
+          (from === FROM_REGION && (fromRegion || fromCountry)) ||
+          (from == FROM_COUNTRY && fromCountry)
+        )
+          fromTrue = true;
+
+        return fromTrue && toTrue;
+      });
+    },
     from: {
       getValue: function(d) {
         return d.pobId;
@@ -48,33 +77,9 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
 
     return data;
   },
-  getDataFilter = function(from, to) {
-    return function(data) {
-      return data.filter(function(d) {
-        var fromTrue = false,
-          toTrue = false,
-          toCanada = settings.to.getValue.call(settings, d) === canadaSgc,
-          toProvince = sgc.sgc.isProvince(settings.to.getValue.call(settings, d));
-        if (
-          (to === TO_CANADA && toCanada) ||
-          (to === TO_PT && toProvince) ||
-          (to === TO_CMA && !toCanada && !toProvince)
-        )
-          toTrue = true;
-
-        if (
-          (from === FROM_CONTINENTS && true) ||
-          (from === FROM_REGION && true) ||
-          (from == FROM_COUNTRY && true)
-        )
-          fromTrue = true;
-
-        return fromTrue && toTrue;
-      });
-    };
-  },
   showData = function() {
-    settings.filterData = getDataFilter(FROM_CONTINENTS, TO_CANADA);
+    settings.from.type = FROM_CONTINENTS;
+    settings.to.type = TO_CANADA;
     chordChart(chart, settings);
   },
   countriesData, birthplaceData, sgcFormatter;
