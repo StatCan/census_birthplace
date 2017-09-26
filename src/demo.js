@@ -58,6 +58,43 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     },
     getPointValue: function() {
       return this.dataPoint.total;
+    },
+    getMatrix: function(data) {
+      var dataLength = data.length,
+        tos = [],
+        froms = [],
+        indexes = [],
+        loopData = function(cb) {
+          var to, from, i, d;
+          for (i = 0; i < dataLength; i++) {
+            d = data[i];
+            to = settings.to.getValue.call(settings, d);
+            from = settings.from.getValue.call(settings, d);
+            cb(d, to, from);
+          }
+        },
+        m, matrix;
+
+      loopData(function(d, to, from) {
+        if (tos.indexOf(to) === -1)
+          tos.push(to);
+
+        if (froms.indexOf(from) === -1)
+          froms.push(from);
+      });
+
+      indexes = indexes.concat(froms, tos);
+      matrix = Array(indexes.length);
+      for (m = 0; m < matrix.length; m++) {
+        matrix[m] = Array(indexes.length).fill(0);
+      }
+      loopData(function(d, to, from) {
+        matrix[indexes.indexOf(from)][indexes.indexOf(to)] = d;
+      });
+      return {
+        indexes: indexes,
+        matrix: matrix
+      };
     }
   },
   processData = function(data) {
