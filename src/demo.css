@@ -1,0 +1,12 @@
+.arcs path {
+	fill: #ffdd89;
+	stroke: #000;
+	stroke-width: 0.2;
+}
+
+.ribbons path {
+	fill: #ffdd89;
+	opacity: .5;
+	stroke: #000;
+	stroke-width: 0.2;
+}
