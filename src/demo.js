@@ -16,6 +16,11 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     .attr("id", "canada_birthplace"),
   rootI18nNs = "census_birthplace",
   canadaSgc = "01",
+  getAngleFn = function(angleProp) {
+    return function(d) {
+      return d[angleProp] - Math.PI;
+    };
+  },
   settings = {
     filterData: function(data) {
       var to = this.to.type,
@@ -56,6 +61,8 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         return d.sgcId;
       }
     },
+    startAngle: getAngleFn("startAngle"),
+    endAngle: getAngleFn("endAngle"),
     getPointValue: function() {
       return this.dataPoint.total;
     },
