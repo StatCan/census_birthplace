@@ -45,7 +45,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
 
 
         if (
-          (from === FROM_CONTINENTS) ||
+          (from === FROM_CONTINENTS && fromRegion || fromId === "OC") ||
           (from === FROM_REGION && (fromRegion || fromCountry)) ||
           (from == FROM_COUNTRY && fromCountry)
         )
@@ -66,17 +66,17 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     },
     arcs: {
       getClass: function(d) {
-        return d.index;
+        return d.index.id;
       },
       getText: function(d) {
         if (d.endAngle - d.startAngle > 0.4) {
-          return getCountryI18n(d.index);
+          return typeof d.index === "object" ? getCountryI18n(d.index.id) : "";
         }
       }
     },
     ribbons: {
       getClass: function(d) {
-        return "sgc_" + d.target.index;
+        return d.source.category;
       }
     },
     startAngle: getAngleFn("startAngle"),
@@ -86,6 +86,9 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     },
     getMatrix: function(data) {
       var dataLength = data.length,
+        toType = this.to.type,
+        fromType = this.from.type,
+        topLevel = [],
         tos = [],
         froms = [],
         indexes = [],
@@ -98,9 +101,27 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
             cb(d, to, from);
           }
         },
-        m, matrix;
+        getParent = function(from) {
+          if (fromType === FROM_CONTINENTS) {
+            if (countriesData.isRegion(from))
+              return countriesData.getRegion(from).continent;
+            return countriesData.getContinent(from);
+          }
+
+          if (fromType === FROM_REGION)
+            return countriesData.getCountry(from).region;
+        },
+        m, matrix, t;
 
       loopData(function(d, to, from) {
+        var parent = getParent(from),
+          parentIndex = topLevel.indexOf(parent);
+
+        if (parentIndex === -1) {
+          parentIndex = topLevel.length;
+          topLevel.push(parent);
+        }
+
         if (tos.indexOf(to) === -1)
           tos.push(to);
 
@@ -108,13 +129,23 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           froms.push(from);
       });
 
-      indexes = indexes.concat(froms, tos);
-      matrix = Array(indexes.length);
-      for (m = 0; m < matrix.length; m++) {
-        matrix[m] = Array(indexes.length).fill(0);
+      indexes.push(indexes.concat(topLevel, tos));
+      indexes.push(froms);
+      matrix = Array(indexes[0].length);
+      for (t = 0; t < indexes[0].length; t++) {
+        matrix[t] = Array(indexes[0].length);
+        for (m = 0; m < matrix[t].length; m++) {
+          matrix[t][m] = Array(indexes[1].length).fill(0);
+        }
       }
+
       loopData(function(d, to, from) {
-        matrix[indexes.indexOf(from)][indexes.indexOf(to)] = d;
+        var parent = getParent(from),
+          parentIndex = topLevel.indexOf(parent),
+          fromIndex = indexes[1].indexOf(from),
+          toIndex = indexes[0].indexOf(to);
+        //matrix[parentIndex][toIndex][fromIndex] = d;
+        matrix[parentIndex][toIndex][fromIndex] = Math.round(Math.random() * 200);
       });
       return {
         indexes: indexes,

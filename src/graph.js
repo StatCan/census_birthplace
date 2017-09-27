@@ -33,14 +33,16 @@ this.chordChart = function(svg, settings) {
             g, group, c, ch;
           for (g = 0; g < newD.groups.length; g++) {
             group = newD.groups[g];
-            group.index = d.indexes[group.index];
+            group.index = d.indexes[0][group.index];
           }
           for (c = 0; c < newD.length; c++) {
             ch = newD[c];
-            ch.source.index = d.indexes[ch.source.index];
-            ch.source.subIndex = d.indexes[ch.source.subIndex];
-            ch.target.index = d.indexes[ch.target.index];
-            ch.target.subIndex = d.indexes[ch.target.subIndex];
+            ch.source.category = d.indexes[1][ch.source.category];
+            ch.target.category = d.indexes[1][ch.target.category];
+            ch.source.index = d.indexes[0][ch.source.index];
+            ch.source.subindex = d.indexes[0][ch.source.subindex];
+            ch.target.index = d.indexes[0][ch.target.index];
+            ch.target.subindex = d.indexes[0][ch.target.subindex];
           }
           return newD;
         },
@@ -60,7 +62,7 @@ this.chordChart = function(svg, settings) {
             return ribbon(i(t));
           };
         },
-        chord = d3.chord()
+        chord = d3.multichord()
           .padAngle(sett.padding),
         arc = d3.arc()
           .innerRadius(innerRadius)
