@@ -161,3 +161,17 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
       showData();
     });
 });
+
+if (!Array.prototype.fill) {
+  Object.defineProperty(Array.prototype, "fill", {
+    value: function(value) {
+      var O = Object(this);
+      var k = 0;
+      while (k < O.length) {
+        O[k] = value;
+        k++;
+      }
+      return O;
+    }
+  });
+}
