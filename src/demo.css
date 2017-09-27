@@ -10,3 +10,7 @@
 	stroke: #000;
 	stroke-width: 0.2;
 }
+
+.arcs text {
+	font-size: 10px;
+}

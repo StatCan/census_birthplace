@@ -21,6 +21,9 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       return d[angleProp] - Math.PI;
     };
   },
+  getCountryI18n = function(id) {
+    return i18next.t(id, {ns: ["continent", "region", "country"]})
+  },
   settings = {
     filterData: function(data) {
       var to = this.to.type,
@@ -64,6 +67,11 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     arcs: {
       getClass: function(d) {
         return d.index;
+      },
+      getText: function(d) {
+        if (d.endAngle - d.startAngle > 0.4) {
+          return getCountryI18n(d.index);
+        }
       }
     },
     ribbons: {
