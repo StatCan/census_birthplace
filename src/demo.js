@@ -66,7 +66,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     },
     arcs: {
       getClass: function(d) {
-        return d.index.id;
+        return typeof d.index === "object" ? d.index.id + " " + d.index.type : d.index;
       },
       getText: function(d) {
         if (d.endAngle - d.startAngle > 0.4) {
@@ -76,7 +76,8 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     },
     ribbons: {
       getClass: function(d) {
-        return d.source.category;
+        var cat = d.source.category;
+        return cat.id + " " + cat.type;
       }
     },
     startAngle: getAngleFn("startAngle"),
@@ -111,10 +112,19 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           if (fromType === FROM_REGION)
             return countriesData.getCountry(from).region;
         },
+        getFrom = function(from) {
+          if (countriesData.isContinent(from))
+            return countriesData.getContinent(from);
+          if (countriesData.isRegion(from))
+            return countriesData.getRegion(from);
+          if (countriesData.isCountry(from))
+            return countriesData.getCountry(from);
+        },
         m, matrix, t;
 
       loopData(function(d, to, from) {
         var parent = getParent(from),
+          fromObj = getFrom(from),
           parentIndex = topLevel.indexOf(parent);
 
         if (parentIndex === -1) {
@@ -125,8 +135,8 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         if (tos.indexOf(to) === -1)
           tos.push(to);
 
-        if (froms.indexOf(from) === -1)
-          froms.push(from);
+        if (froms.indexOf(fromObj) === -1)
+          froms.push(fromObj);
       });
 
       indexes.push(indexes.concat(topLevel, tos));
@@ -141,10 +151,12 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
 
       loopData(function(d, to, from) {
         var parent = getParent(from),
+          fromObj = getFrom(from),
           parentIndex = topLevel.indexOf(parent),
-          fromIndex = indexes[1].indexOf(from),
+          fromIndex = indexes[1].indexOf(fromObj),
           toIndex = indexes[0].indexOf(to);
         //matrix[parentIndex][toIndex][fromIndex] = d;
+        //TODO: Remove when using real data
         matrix[parentIndex][toIndex][fromIndex] = Math.round(Math.random() * 200);
       });
       return {
