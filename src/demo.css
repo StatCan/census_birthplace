@@ -6,11 +6,99 @@
 
 .ribbons path {
 	fill: #ffdd89;
-	opacity: .5;
+	opacity: .85;
 	stroke: #000;
 	stroke-width: 0.2;
 }
 
 .arcs text {
 	font-size: 10px;
+}
+
+.AM path {
+	fill: #b20c0c;
+}
+
+.EU path {
+	fill: #0c56b2;
+}
+
+.AF path {
+	fill: #735184;
+}
+
+.AS path {
+	fill: #6fb20c;
+}
+
+.OC path {
+	fill: #DE770E;
+}
+
+.AM-NA path {
+	fill: #F00;
+}
+
+.AM-CA path {
+	fill: #ce0000;
+}
+
+.AM-CR path {
+	fill: #960000;
+}
+
+.AM-SA path {
+	fill: #510000;
+}
+
+.EU-WE path {
+	fill: #00f;
+}
+
+.EU-EE path {
+	fill: #0000c4;
+}
+
+.EU-NE path {
+	fill: #000096;
+}
+
+.EU-SE path {
+	fill: #000075;
+}
+
+.AF-WA path {
+	fill: #735184;
+}
+
+.AF-EA path {
+	fill: #543b60;
+}
+
+.AF-NA path {
+	fill: #422e4c;
+}
+
+.AF-CA path {
+	fill: #291d30;
+}
+
+.AF-SA path {
+	fill: #18111c;
+}
+
+.AS-ME path {
+	fill: #6fb20c;
+}
+
+.AS-EA path {
+	fill: #609b09;
+}
+
+.AS-SE path {
+	fill: #4f7f07;
+}
+
+.AS-SA path {
+	fill: #375905;
 }
