@@ -52,6 +52,19 @@
 	fill: #510000;
 }
 
+.AM-SA text,
+.EU-NE text,
+.EU-SE text,
+.EU-EE text,
+.EU-WE text,
+.AF-WA text,
+.AF-EA text,
+.AF-NA text,
+.AF-CA text,
+.AF-SA text {
+	fill: #fff;
+}
+
 .EU-WE path {
 	fill: #00f;
 }
