@@ -2,6 +2,7 @@ const FROM_CONTINENTS = 1,
   FROM_CONTINENT = 2,
   FROM_REGION = 3,
   FROM_COUNTRY = 4,
+  FROM_OCEANIA = 5,
   TO_CANADA = 1,
   TO_PT = 2,
   TO_CMA = 3;
@@ -48,6 +49,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         if (
           (from === FROM_CONTINENTS && (fromRegion || fromId === "OC")) ||
           (from === FROM_CONTINENT && fromCountry && fromCountry.region && fromCountry.region.continent.id === fromArg) ||
+          (from === FROM_OCEANIA && fromCountry && fromCountry.continent && fromCountry.continent.id === "OC") ||
           (from === FROM_REGION && (fromRegion || fromCountry)) ||
           (from == FROM_COUNTRY && fromCountry)
         )
@@ -113,6 +115,10 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
 
           if (fromType === FROM_CONTINENT)
             return countriesData.getCountry(from).region;
+
+          if (fromType === FROM_OCEANIA) {
+            return countriesData.getCountry(from).continent;
+          }
         },
         getFrom = function(from) {
           if (countriesData.isContinent(from))
