@@ -237,7 +237,11 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       type = classes[1];
 
     if (type === "continent") {
-      showData(FROM_CONTINENT, TO_CANADA, id);
+      if (id === "OC") {
+        showData(FROM_OCEANIA, TO_CANADA);
+      } else {
+        showData(FROM_CONTINENT, TO_CANADA, id);
+      }
     }
 
     if (type === "region") {
