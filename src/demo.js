@@ -50,7 +50,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           (from === FROM_CONTINENTS && (fromRegion || fromId === "OC")) ||
           (from === FROM_CONTINENT && fromCountry && fromCountry.region && fromCountry.region.continent.id === fromArg) ||
           (from === FROM_OCEANIA && fromCountry && fromCountry.continent && fromCountry.continent.id === "OC") ||
-          (from === FROM_REGION && (fromRegion || fromCountry)) ||
+          (from === FROM_REGION && fromCountry && fromCountry.region &&fromCountry.region.id === fromArg) ||
           (from == FROM_COUNTRY && fromCountry)
         )
           fromTrue = true;
@@ -116,9 +116,11 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           if (fromType === FROM_CONTINENT)
             return countriesData.getCountry(from).region;
 
-          if (fromType === FROM_OCEANIA) {
+          if (fromType === FROM_OCEANIA)
             return countriesData.getCountry(from).continent;
-          }
+
+          if (fromType === FROM_REGION)
+            return countriesData.getCountry(from).region;
         },
         getFrom = function(from) {
           if (countriesData.isContinent(from))
