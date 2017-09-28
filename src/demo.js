@@ -189,7 +189,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     settings.to.type = TO_CANADA;
     chordChart(chart, settings);
   },
-  countriesData, birthplaceData, sgcFormatter;
+  countriesData, birthplaceData, sgcFormatter, hoverTimeout;
 
 i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
   d3.queue()
@@ -204,6 +204,32 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
       settings.data = birthplaceData.mappings;
 
       showData();
+
+      $(document).on("mouseover mouseout", "#canada_birthplace path", function(e) {
+        var hoverClass = "hovering",
+          obj;
+        clearTimeout(hoverTimeout);
+        switch (e.type) {
+        case "mouseover":
+          obj = d3.select(e.target.parentNode).data()[0];
+          chart.select(".data").classed("hover", true);
+          chart.selectAll("." + hoverClass).classed(hoverClass, false);
+          d3.select(e.target.parentNode).classed(hoverClass, true);
+          if (obj.source) {
+            d3.select("." + obj.source.index.id).classed(hoverClass, true);
+          }
+          break;
+        case "mouseout":
+          hoverTimeout = setTimeout(function() {
+            $("#canada_birthplace .data").trigger("mouseout");
+          }, 100);
+          return false;
+        }
+      });
+
+      $(document).on("mouseout", "#canada_birthplace .data", function() {
+        chart.select(".data").classed("hover", false);
+      });
     });
 });
 

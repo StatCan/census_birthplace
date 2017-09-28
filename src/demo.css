@@ -102,3 +102,11 @@
 .AS-SA path {
 	fill: #375905;
 }
+
+.hover  path {
+	opacity: 0.2;
+}
+
+.hover .hovering path {
+	opacity: inherit;
+}
