@@ -192,10 +192,57 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
 
     return data;
   },
-  showData = function() {
-    settings.from.type = FROM_CONTINENTS;
-    settings.to.type = TO_CANADA;
+  showData = function(from, to, fromArg, toArg) {
+    settings.from.type = from;
+    settings.to.type = to;
+
+    if (fromArg) {
+      settings.from.arg = fromArg;
+    }
+
+    if (toArg) {
+      settings.from.arg = toArg;
+    }
+
+    chart.select(".data").remove();
     chordChart(chart, settings);
+  },
+  onMouseOver = function(e) {
+    var hoverClass = "hovering",
+      obj;
+    clearTimeout(hoverTimeout);
+    switch (e.type) {
+    case "mouseover":
+      obj = d3.select(e.target.parentNode).data()[0];
+      chart.select(".data").classed("hover", true);
+      chart.selectAll("." + hoverClass).classed(hoverClass, false);
+      d3.select(e.target.parentNode).classed(hoverClass, true);
+      if (obj.source) {
+        d3.select("." + obj.source.index.id).classed(hoverClass, true);
+      }
+      break;
+    case "mouseout":
+      hoverTimeout = setTimeout(function() {
+        $("#canada_birthplace .data").trigger("mouseout");
+      }, 100);
+      return false;
+    }
+  },
+  onMouseOut = function() {
+    chart.select(".data").classed("hover", false);
+  },
+  onClick = function(e) {
+    var classes = e.target.parentNode.className.baseVal.split(" "),
+      id = classes[0],
+      type = classes[1];
+
+    if (type === "continent") {
+      showData(FROM_CONTINENT, TO_CANADA, id);
+    }
+
+    if (type === "region") {
+      showData(FROM_REGION, TO_CANADA, id);
+    }
   },
   countriesData, birthplaceData, sgcFormatter, hoverTimeout;
 
@@ -211,33 +258,11 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
 
       settings.data = birthplaceData.mappings;
 
-      showData();
+      showData(FROM_CONTINENTS, TO_CANADA);
 
-      $(document).on("mouseover mouseout", "#canada_birthplace path", function(e) {
-        var hoverClass = "hovering",
-          obj;
-        clearTimeout(hoverTimeout);
-        switch (e.type) {
-        case "mouseover":
-          obj = d3.select(e.target.parentNode).data()[0];
-          chart.select(".data").classed("hover", true);
-          chart.selectAll("." + hoverClass).classed(hoverClass, false);
-          d3.select(e.target.parentNode).classed(hoverClass, true);
-          if (obj.source) {
-            d3.select("." + obj.source.index.id).classed(hoverClass, true);
-          }
-          break;
-        case "mouseout":
-          hoverTimeout = setTimeout(function() {
-            $("#canada_birthplace .data").trigger("mouseout");
-          }, 100);
-          return false;
-        }
-      });
-
-      $(document).on("mouseout", "#canada_birthplace .data", function() {
-        chart.select(".data").classed("hover", false);
-      });
+      $(document).on("mouseover mouseout", "#canada_birthplace path", onMouseOver);
+      $(document).on("mouseout", "#canada_birthplace .data", onMouseOut);
+      $(document).on("click", "#canada_birthplace .arcs path", onClick);
     });
 });
 
