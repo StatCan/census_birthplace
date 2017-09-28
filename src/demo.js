@@ -1,6 +1,7 @@
 const FROM_CONTINENTS = 1,
-  FROM_REGION = 2,
-  FROM_COUNTRY = 3,
+  FROM_CONTINENT = 2,
+  FROM_REGION = 3,
+  FROM_COUNTRY = 4,
   TO_CANADA = 1,
   TO_PT = 2,
   TO_CMA = 3;
@@ -22,20 +23,21 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     };
   },
   getCountryI18n = function(id) {
-    return i18next.t(id, {ns: ["continent", "region", "country"]})
+    return i18next.t(id, {ns: ["continent", "region", "country"]});
   },
   settings = {
     filterData: function(data) {
       var to = this.to.type,
-        from = this.from.type;
+        from = this.from.type,
+        fromArg = this.from.arg;
       return data.filter(function(d) {
         var fromTrue = false,
           toTrue = false,
           toCanada = settings.to.getValue.call(settings, d) === canadaSgc,
           toProvince = sgc.sgc.isProvince(settings.to.getValue.call(settings, d)),
           fromId = settings.from.getValue.call(settings, d),
-          fromRegion = countriesData.isRegion(fromId),
-          fromCountry = countriesData.isCountry(fromId);
+          fromRegion = countriesData.isRegion(fromId) ? countriesData.getRegion(fromId) : null,
+          fromCountry = countriesData.isCountry(fromId) ? countriesData.getCountry(fromId) : null;
         if (
           (to === TO_CANADA && toCanada) ||
           (to === TO_PT && toProvince) ||
@@ -43,9 +45,9 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         )
           toTrue = true;
 
-
         if (
-          (from === FROM_CONTINENTS && fromRegion || fromId === "OC") ||
+          (from === FROM_CONTINENTS && (fromRegion || fromId === "OC")) ||
+          (from === FROM_CONTINENT && fromCountry && fromCountry.region && fromCountry.region.continent.id === fromArg) ||
           (from === FROM_REGION && (fromRegion || fromCountry)) ||
           (from == FROM_COUNTRY && fromCountry)
         )
@@ -109,7 +111,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
             return countriesData.getContinent(from);
           }
 
-          if (fromType === FROM_REGION)
+          if (fromType === FROM_CONTINENT)
             return countriesData.getCountry(from).region;
         },
         getFrom = function(from) {
