@@ -13,9 +13,12 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   sgcDataUrl = "lib/statcan_sgc/sgc.json",
   countriesDataUrl = "lib/statcan_countries/countries.json",
   birthplaceDataUrl = "data/census_birthplace.json",
-  container = d3.select(".birthplace .data"),
-  chart = container.append("svg")
-    .attr("id", "canada_birthplace"),
+  fromContainer = d3.select(".birthplace .data.from"),
+  fromChart = fromContainer.append("svg")
+    .attr("id", "canada_birthplace_from"),
+  toContainer = d3.select(".birthplace .data.to"),
+  toChart = toContainer.append("svg")
+    .attr("id", "canada_birthplace_to"),
   rootI18nNs = "census_birthplace",
   canadaSgc = "01",
   getAngleFn = function(angleProp) {
@@ -26,36 +29,45 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   getCountryI18n = function(id) {
     return i18next.t(id, {ns: ["continent", "region", "country"]});
   },
-  settings = {
+  baseSettings = {
+    aspectRatio: 1,
     filterData: function(data) {
-      var to = this.to.type,
-        from = this.from.type,
-        fromArg = this.from.arg;
+      var sett = this,
+        to = sett.to.type,
+        from = sett.from.type,
+        fromArg = sett.from.arg;
       return data.filter(function(d) {
-        var fromTrue = false,
-          toTrue = false,
-          toCanada = settings.to.getValue.call(settings, d) === canadaSgc,
-          toProvince = sgc.sgc.isProvince(settings.to.getValue.call(settings, d)),
-          fromId = settings.from.getValue.call(settings, d),
+        var toId = sett.to.getValue.call(sett, d),
+          toCanada = toId === canadaSgc,
+          toProvince = sgc.sgc.isProvince(toId),
+          fromId = sett.from.getValue.call(sett, d),
           fromRegion = countriesData.isRegion(fromId) ? countriesData.getRegion(fromId) : null,
           fromCountry = countriesData.isCountry(fromId) ? countriesData.getCountry(fromId) : null;
-        if (
-          (to === TO_CANADA && toCanada) ||
-          (to === TO_PT && toProvince) ||
-          (to === TO_CMA && !toCanada && !toProvince)
-        )
-          toTrue = true;
 
-        if (
-          (from === FROM_CONTINENTS && (fromRegion || fromId === "OC")) ||
-          (from === FROM_CONTINENT && fromCountry && fromCountry.region && fromCountry.region.continent.id === fromArg) ||
-          (from === FROM_OCEANIA && fromCountry && fromCountry.continent && fromCountry.continent.id === "OC") ||
-          (from === FROM_REGION && fromCountry && fromCountry.region && fromCountry.region.id === fromArg) ||
-          (from == FROM_COUNTRY && fromCountry && fromCountry.id === fromArg)
-        )
-          fromTrue = true;
+        if (to === TO_CANADA) {
+          if (!toCanada)
+            return false;
 
-        return fromTrue && toTrue;
+          if (
+            (from === FROM_CONTINENTS && (fromRegion || fromId === "OC")) ||
+            (from === FROM_CONTINENT && fromCountry && fromCountry.region && fromCountry.region.continent.id === fromArg) ||
+            (from === FROM_OCEANIA && fromCountry && fromCountry.continent && fromCountry.continent.id === "OC") ||
+            (from === FROM_REGION && fromCountry && fromCountry.region && fromCountry.region.id === fromArg) ||
+            (from == FROM_COUNTRY && fromCountry && fromCountry.id === fromArg)
+          )
+            return true;
+        } else {
+          if (
+            (from === FROM_CONTINENTS && fromId !== "OUTSIDE") ||
+            (from !== FROM_CONTINENTS && fromId !== fromArg)
+          )
+            return false;
+
+          if (
+            toId !== "01"
+          )
+            return true;
+        }
       });
     },
     from: {
@@ -68,31 +80,14 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         return d.sgcId;
       }
     },
-    arcs: {
-      getClass: function(d) {
-        return typeof d.index === "object" ? d.index.id + " " + d.index.type : d.index;
-      },
-      getText: function(d) {
-        if (d.endAngle - d.startAngle > 0.4) {
-          return typeof d.index === "object" ? getCountryI18n(d.index.id) : "";
-        }
-      }
-    },
-    ribbons: {
-      getClass: function(d) {
-        var cat = d.source.category;
-        return cat.id + " " + cat.type;
-      }
-    },
-    startAngle: getAngleFn("startAngle"),
-    endAngle: getAngleFn("endAngle"),
     getPointValue: function(d) {
       return d.dataPoint.total;
     },
     getMatrix: function(data) {
-      var dataLength = data.length,
-        toType = this.to.type,
-        fromType = this.from.type,
+      var sett = this,
+        dataLength = data.length,
+        toType = sett.to.type,
+        fromType = sett.from.type,
         topLevel = [],
         tos = [],
         froms = [],
@@ -101,12 +96,12 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           var to, from, i, d;
           for (i = 0; i < dataLength; i++) {
             d = data[i];
-            to = settings.to.getValue.call(settings, d);
-            from = settings.from.getValue.call(settings, d);
+            to = sett.to.getValue.call(sett, d);
+            from = sett.from.getValue.call(sett, d);
             cb(d, to, from);
           }
         },
-        getParent = function(from) {
+        getFromParent = function(from) {
           if (fromType === FROM_CONTINENTS) {
             if (countriesData.isRegion(from))
               return countriesData.getRegion(from).continent;
@@ -133,10 +128,13 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           if (countriesData.isCountry(from))
             return countriesData.getCountry(from);
         },
+        getToParent = function(to) {
+          return to;
+        },
         m, matrix, t;
 
       loopData(function(d, to, from) {
-        var parent = getParent(from),
+        var parent = toType === TO_CANADA ? getFromParent(from) : getToParent(to),
           fromObj = getFrom(from),
           parentIndex = topLevel.indexOf(parent);
 
@@ -152,8 +150,14 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           froms.push(fromObj);
       });
 
-      indexes.push(indexes.concat(topLevel, tos));
-      indexes.push(froms);
+      if (toType === TO_CANADA) {
+        indexes.push(indexes.concat(topLevel, tos));
+        indexes.push(froms);
+      } else {
+        indexes.push(indexes.concat(topLevel, froms));
+        indexes.push(tos);
+      }
+
       matrix = Array(indexes[0].length);
       for (t = 0; t < indexes[0].length; t++) {
         matrix[t] = Array(indexes[0].length);
@@ -163,17 +167,70 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       }
 
       loopData(function(d, to, from) {
-        var parent = getParent(from),
+        var parent = toType === TO_CANADA ? getFromParent(from) : getToParent(to),
           fromObj = getFrom(from),
           parentIndex = topLevel.indexOf(parent),
-          fromIndex = indexes[1].indexOf(fromObj),
+          fromIndex, toIndex;
+
+        if (toType === TO_CANADA) {
+          fromIndex = indexes[1].indexOf(fromObj);
           toIndex = indexes[0].indexOf(to);
-        matrix[parentIndex][toIndex][fromIndex] = settings.getPointValue.call(settings, d);
+          matrix[parentIndex][toIndex][fromIndex] = sett.getPointValue.call(sett, d);
+          //TODO: Remove when using real data
+          //matrix[parentIndex][toIndex][fromIndex] = Math.round(Math.random() * 200);
+        } else {
+          fromIndex = indexes[0].indexOf(fromObj);
+          toIndex = indexes[1].indexOf(to);
+          matrix[parentIndex][fromIndex][toIndex] = sett.getPointValue.call(sett, d);
+          //TODO: Remove when using real data
+          //matrix[parentIndex][fromIndex][toIndex] = Math.round(Math.random() * 200);
+        }
       });
       return {
         indexes: indexes,
         matrix: matrix
       };
+    }
+  },
+  fromSettings = {
+    to: {
+      type: TO_CANADA
+    },
+
+    arcs: {
+      getClass: function(d) {
+        return typeof d.index === "object" ? d.index.id + " " + d.index.type : d.index;
+      },
+      getText: function(d) {
+        if (d.endAngle - d.startAngle > 0.4) {
+          return typeof d.index === "object" ? getCountryI18n(d.index.id) : "";
+        }
+      }
+    },
+    ribbons: {
+      getClass: function(d) {
+        var cat = d.source.category;
+        return cat.id + " " + cat.type;
+      }
+    },
+    startAngle: getAngleFn("startAngle"),
+    endAngle: getAngleFn("endAngle"),
+  },
+  toSettings = {
+    arcs: {
+      getClass: function(d) {
+        return "sgc_" + d.index;
+      },
+      getText: function(d) {
+        if (d.endAngle - d.startAngle > 0.4) {
+          return sgcFormatter.format(d.index);
+        }
+      }
+    },
+    ribbons: {
+      getClass: function(d) {
+        return "sgc_" + d.source.index;
+      }
     }
   },
   processData = function(data) {
@@ -200,20 +257,24 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     }
     return newData;
   },
-  showData = function(from, to, fromArg, toArg) {
-    settings.from.type = from;
-    settings.to.type = to;
+  showData = function() {
+    fromSettings.from.type = showFrom;
+    toSettings.from.type = showFrom;
+    toSettings.to.type = showTo;
 
-    if (fromArg) {
-      settings.from.arg = fromArg;
+    if (showFromArg) {
+      fromSettings.from.arg = showFromArg;
+      toSettings.from.arg = showFromArg;
     }
 
-    if (toArg) {
-      settings.from.arg = toArg;
+    if (showToArg) {
+      toSettings.from.arg = showToArg;
     }
 
-    chart.select(".data").remove();
-    chordChart(chart, settings);
+    toChart.select(".data").remove();
+    fromChart.select(".data").remove();
+    chordChart(fromChart, fromSettings);
+    chordChart(toChart, toSettings);
   },
   onMouseOver = function(e) {
     var hoverClass = "hovering",
@@ -222,8 +283,8 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     switch (e.type) {
     case "mouseover":
       obj = d3.select(e.target.parentNode).data()[0];
-      chart.select(".data").classed("hover", true);
-      chart.selectAll("." + hoverClass).classed(hoverClass, false);
+      fromChart.select(".data").classed("hover", true);
+      fromChart.selectAll("." + hoverClass).classed(hoverClass, false);
       d3.select(e.target.parentNode).classed(hoverClass, true);
       if (obj.source) {
         d3.select("." + obj.source.index.id).classed(hoverClass, true);
@@ -231,35 +292,41 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       break;
     case "mouseout":
       hoverTimeout = setTimeout(function() {
-        $("#canada_birthplace .data").trigger("mouseout");
+        $("#canada_birthplace_from .data").trigger("mouseout");
       }, 100);
       return false;
     }
   },
   onMouseOut = function() {
-    chart.select(".data").classed("hover", false);
+    fromChart.select(".data").classed("hover", false);
   },
   onClick = function(e) {
     var classes = e.target.parentNode.className.baseVal.split(" "),
       id = classes[0],
       type = classes[1];
 
-    if (type === "continent") {
-      if (id === "OC") {
-        showData(FROM_OCEANIA, TO_CANADA);
-      } else {
-        showData(FROM_CONTINENT, TO_CANADA, id);
+    if (type === "continent" && id === "OC") {
+      showFrom = FROM_OCEANIA;
+      showFromArg = null;
+    } else {
+      switch (type) {
+      case "continent":
+        showFrom = FROM_CONTINENT;
+        break;
+      case "region":
+        showFrom = FROM_REGION;
+        break;
+      case "country":
+        showFrom = FROM_COUNTRY;
       }
+      showFromArg = id;
     }
-
-    if (type === "region") {
-      showData(FROM_REGION, TO_CANADA, id);
-    }
-
-    if (type === "country") {
-      showData(FROM_COUNTRY, TO_CANADA, id);
-    }
+    showData();
   },
+  showFrom = FROM_CONTINENTS,
+  showFromArg = null,
+  showTo = TO_PT,
+  showToArg = null,
   countriesData, birthplaceData, sgcFormatter, hoverTimeout;
 
 i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
@@ -268,17 +335,21 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
     .defer(d3.json, countriesDataUrl)
     .defer(d3.json, birthplaceDataUrl)
     .await(function(error, sgcs, countries, birthplace) {
+      var extra = {};
       sgcFormatter = sgc.getFormatter(sgcs);
       countriesData = statcan_countries(countries);
-      birthplaceData = processData(birthplace);
+      birthplaceData = processData.call(baseSettings, birthplace);
 
-      settings.data = birthplaceData;
+      extra.data = birthplaceData;
 
-      showData(FROM_CONTINENTS, TO_CANADA);
+      fromSettings = $.extend(true, {}, baseSettings, fromSettings, extra);
+      toSettings = $.extend(true, {}, baseSettings, toSettings, extra);
 
-      $(document).on("mouseover mouseout", "#canada_birthplace path", onMouseOver);
-      $(document).on("mouseout", "#canada_birthplace .data", onMouseOut);
-      $(document).on("click", "#canada_birthplace .arcs path", onClick);
+      showData();
+
+      $(document).on("mouseover mouseout", "#canada_birthplace_from path", onMouseOver);
+      $(document).on("mouseout", "#canada_birthplace_from .data", onMouseOut);
+      $(document).on("click", "#canada_birthplace_from .arcs path", onClick);
     });
 });
 
