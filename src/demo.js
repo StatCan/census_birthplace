@@ -86,8 +86,8 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     },
     startAngle: getAngleFn("startAngle"),
     endAngle: getAngleFn("endAngle"),
-    getPointValue: function() {
-      return this.dataPoint.total;
+    getPointValue: function(d) {
+      return d.dataPoint.total;
     },
     getMatrix: function(data) {
       var dataLength = data.length,
@@ -165,9 +165,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           parentIndex = topLevel.indexOf(parent),
           fromIndex = indexes[1].indexOf(fromObj),
           toIndex = indexes[0].indexOf(to);
-        //matrix[parentIndex][toIndex][fromIndex] = d;
-        //TODO: Remove when using real data
-        matrix[parentIndex][toIndex][fromIndex] = Math.round(Math.random() * 200);
+        matrix[parentIndex][toIndex][fromIndex] = settings.getPointValue.call(settings, d);
       });
       return {
         indexes: indexes,
@@ -176,21 +174,28 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     }
   },
   processData = function(data) {
-    var dataLength = data.mappings.length,
-      pointsLength = data.dataPoints.length,
-      i, d, p;
+    var newData = [],
+      xIndexes = data.indexes[0].data,
+      yIndexes = data.indexes[1].data,
+      props = Object.keys(data.values),
+      newObj, x, y, z, id;
 
-    for (i = 0; i < dataLength; i++) {
-      d = data.mappings[i];
-      d.valueOf = settings.getPointValue;
-      for (p = 0; p < pointsLength; p ++) {
-        if (d.dpId === data.dataPoints[p].id) {
-          d.dataPoint = data.dataPoints[p];
+    for (x = 0; x < xIndexes.length; x ++) {
+      for(y = 0; y < yIndexes.length; y++) {
+        id = data.matrix[x][y];
+        newObj = {
+          pobId: xIndexes[x],
+          sgcId: yIndexes[y],
+          dataPoint: {}
+        };
+
+        for (z = 0; z < props.length; z++) {
+          newObj.dataPoint[props[z]] = data.values[props[z]][id];
         }
+        newData.push(newObj);
       }
     }
-
-    return data;
+    return newData;
   },
   showData = function(from, to, fromArg, toArg) {
     settings.from.type = from;
@@ -258,9 +263,9 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
     .await(function(error, sgcs, countries, birthplace) {
       sgcFormatter = sgc.getFormatter(sgcs);
       countriesData = statcan_countries(countries);
-      birthplaceData = processData(birthplace.pob);
+      birthplaceData = processData(birthplace);
 
-      settings.data = birthplaceData.mappings;
+      settings.data = birthplaceData;
 
       showData(FROM_CONTINENTS, TO_CANADA);
 
