@@ -50,8 +50,8 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           (from === FROM_CONTINENTS && (fromRegion || fromId === "OC")) ||
           (from === FROM_CONTINENT && fromCountry && fromCountry.region && fromCountry.region.continent.id === fromArg) ||
           (from === FROM_OCEANIA && fromCountry && fromCountry.continent && fromCountry.continent.id === "OC") ||
-          (from === FROM_REGION && fromCountry && fromCountry.region &&fromCountry.region.id === fromArg) ||
-          (from == FROM_COUNTRY && fromCountry)
+          (from === FROM_REGION && fromCountry && fromCountry.region && fromCountry.region.id === fromArg) ||
+          (from == FROM_COUNTRY && fromCountry && fromCountry.id === fromArg)
         )
           fromTrue = true;
 
@@ -120,6 +120,9 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
             return countriesData.getCountry(from).continent;
 
           if (fromType === FROM_REGION)
+            return countriesData.getCountry(from);
+
+          if (fromType === FROM_COUNTRY)
             return countriesData.getCountry(from);
         },
         getFrom = function(from) {
@@ -251,6 +254,10 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
 
     if (type === "region") {
       showData(FROM_REGION, TO_CANADA, id);
+    }
+
+    if (type === "country") {
+      showData(FROM_COUNTRY, TO_CANADA, id);
     }
   },
   countriesData, birthplaceData, sgcFormatter, hoverTimeout;
