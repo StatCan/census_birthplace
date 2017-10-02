@@ -54,6 +54,8 @@ this.chordChart = function(svg, settings) {
             return arc(i(t));
           };
         },
+        arcsClass = sett.arcs && sett.arcs.getClass ? sett.arcs.getClass.bind(sett) : null,
+        arcsText = sett.arcs && sett.arcs.getText ? sett.arcs.getText.bind(sett) : null,
         ribbonTween = function(d) {
           var i = d3.interpolate(this._current, d);
           this._current = i(0);
@@ -62,6 +64,7 @@ this.chordChart = function(svg, settings) {
             return ribbon(i(t));
           };
         },
+        ribbonsClass = sett.ribbons ? sett.ribbons.getClass.bind(sett) : null,
         chord = d3.multichord()
           .padAngle(sett.padding),
         arc = d3.arc()
@@ -109,7 +112,7 @@ this.chordChart = function(svg, settings) {
       arcs
         .enter()
         .append("g")
-          .attr("class", sett.arcs ? sett.arcs.getClass.bind(sett) : null)
+          .attr("class", arcsClass)
           .each(function(d, index) {
             var parent = d3.select(this),
               arcId = function() {
@@ -127,11 +130,11 @@ this.chordChart = function(svg, settings) {
                 .attr("href", function() {
                   return "#" + arcId.apply(this, arguments);
                 })
-                .text(sett.arcs.getText);
+                .text(arcsText);
           });
 
       arcs
-        .attr("class", sett.arcs ? sett.arcs.getClass.bind(sett) : null)
+        .attr("class", arcsClass)
         .each(function() {
           d3.select(this).select("path")
             .transition(transition)
@@ -145,14 +148,14 @@ this.chordChart = function(svg, settings) {
       ribbons
         .enter()
         .append("g")
-          .attr("class", sett.ribbons ? sett.ribbons.getClass.bind(sett) : null)
+          .attr("class", ribbonsClass)
           .each(function() {
             d3.select(this).append("path")
               .attr("d", ribbon);
           });
 
       ribbons
-        .attr("class", sett.ribbons ? sett.ribbons.getClass.bind(sett) : null)
+        .attr("class", ribbonsClass)
         .each(function() {
           d3.select(this).select("path")
             .transition(transition)
