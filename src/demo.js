@@ -120,7 +120,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
             return countriesData.getCountry(from).continent;
 
           if (fromType === FROM_REGION)
-            return countriesData.getCountry(from).region;
+            return countriesData.getCountry(from);
         },
         getFrom = function(from) {
           if (countriesData.isContinent(from))
