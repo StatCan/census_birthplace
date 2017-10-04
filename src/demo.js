@@ -293,6 +293,22 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     chordChart(fromChart, fromSettings);
     chordChart(toChart, toSettings);
   },
+  fillPobSelect = function(pobData) {
+    var pobs = pobData.indexes[0].data,
+      createOption = function(id) {
+        var $pob = $(window.pob);
+        $("<option></option>")
+          .attr("value", id)
+          .text(getCountryI18n(id))
+          .appendTo($pob);
+      },
+      c, continent, r, region, ct, country;
+
+    for (c = 0; c < countriesData.continents.length; c++) {
+      continent = countriesData.continents[c];
+      createOption(continent.id);
+    }
+  },
   onMouseOver = function(e) {
     var hoverClass = "hovering",
       obj;
@@ -356,6 +372,7 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
       sgcFormatter = sgc.getFormatter(sgcs);
       countriesData = statcan_countries(countries);
       birthplaceData = processData.call(baseSettings, birthplace);
+      fillPobSelect(birthplace);
 
       extra.data = birthplaceData;
 

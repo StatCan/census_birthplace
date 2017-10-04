@@ -56,7 +56,12 @@
 			<h1 property="name" id="wb-cont">Lieu de naissance, Recensement de 2011</h1>
 			<p id="chgnot" class="wb-inv">Toute modification apportera automatiquement une mise à jour au contenu de la page.</p>
 			<form onsubmit="return false;">
-
+				<div class="form-group col-md-6">
+					<label for="pob">Lieu de naissance</label>
+					<select id="pob" class="form-control" aria-describedby="chgnot">
+						<option value="OUTSIDE">À l'extérieur du Canada</option>
+					</select>
+				</div>
 			</form>
 			<a href="#chrt-dt-tbl" class="wb-inv wb-show-onfocus">Passer le diagramme visuel interactif et passer directement à la table de données des revenus</a>
 			<div class="row">
