@@ -140,6 +140,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           parentIndex = topLevel.indexOf(parent);
 
         if (parentIndex === -1) {
+            //this value is never used
           parentIndex = topLevel.length;
           topLevel.push(parent);
         }
@@ -231,7 +232,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       }
     },
     startAngle: getAngleFn("startAngle"),
-    endAngle: getAngleFn("endAngle"),
+    endAngle: getAngleFn("endAngle")
   },
   toSettings = {
     arcs: {
@@ -293,6 +294,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     chordChart(fromChart, fromSettings);
     chordChart(toChart, toSettings);
   },
+
   fillPobSelect = function(pobData) {
     var pobs = pobData.indexes[0].data,
       createOption = function(id) {
@@ -302,11 +304,33 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           .text(getCountryI18n(id))
           .appendTo($pob);
       },
-      c, continent, r, region, ct, country;
+      loopCountries = function(geo) {
+        var ct, country;
+        for (ct = 0; ct < geo.countries.length; ct++) {
+          country = geo.countries[ct];
+          if (pobs.indexOf(country.id) !== -1) {
+            createOption(country.id);
+          }
+        }
+      },
+      c, continent, r, region;
 
     for (c = 0; c < countriesData.continents.length; c++) {
       continent = countriesData.continents[c];
       createOption(continent.id);
+
+      if (continent.regions) {
+        for (r = 0; r < continent.regions.length; r++) {
+          region = continent.regions[r];
+          createOption(region.id);
+
+          if (region.countries) {
+            loopCountries(region);
+          }
+        }
+      } else if (continent.countries) {
+        loopCountries(continent);
+      }
     }
   },
   onMouseOver = function(e) {
