@@ -380,6 +380,29 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     }
     showData();
   },
+  onSelectCountry = function(e) {
+    var id = e.target.value;
+    if (id === "OUTSIDE") {
+      showFrom = FROM_CONTINENTS;
+      showFromArg = null;
+    } else if (id === "OC") {
+      showFrom = FROM_OCEANIA;
+      showFromArg = null;
+    } else {
+      if (countriesData.isContinent(id)) {
+        showFrom = FROM_CONTINENT;
+      } else if (countriesData.isRegion(id)) {
+        showFrom = FROM_REGION;
+      } else if (countriesData.isCountry(id)) {
+        showFrom = FROM_COUNTRY;
+      } else {
+        return false;
+      }
+
+      showFromArg = id;
+    }
+    showData();
+  },
   showFrom = FROM_CONTINENTS,
   showFromArg = null,
   showTo = TO_PT,
@@ -408,6 +431,7 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
       $(document).on("mouseover mouseout", "#canada_birthplace_from path", onMouseOver);
       $(document).on("mouseout", "#canada_birthplace_from .data", onMouseOut);
       $(document).on("click", "#canada_birthplace_from .arcs path", onClick);
+      $(document).on("change", ".birthplace", onSelectCountry);
     });
 });
 
