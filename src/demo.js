@@ -199,7 +199,18 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
 
     arcs: {
       getClass: function(d) {
-        return typeof d.index === "object" ? d.index.id + " " + d.index.type : d.index;
+        var cl = "";
+        if (typeof d.index === "object") {
+          cl += d.index.id + " " + d.index.type;
+
+          if (d.index.type === "country"){
+            cl += " " + (d.index.region || d.index.continent).id + "-ct";
+          }
+        } else {
+          d.index;
+        }
+
+        return cl;
       },
       getText: function(d) {
         if (d.endAngle - d.startAngle > 0.4) {
@@ -209,8 +220,13 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     },
     ribbons: {
       getClass: function(d) {
-        var cat = d.source.category;
-        return cat.id + " " + cat.type;
+        var cat = d.source.category,
+          cl = cat.id + " " + cat.type;
+
+        if (cat.type === "country") {
+          cl += " " + (cat.region || cat.continent).id + "-ct";
+        }
+        return cl;
       }
     },
     startAngle: getAngleFn("startAngle"),

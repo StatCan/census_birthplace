@@ -36,84 +36,111 @@
 	fill: #DE770E;
 }
 
-.AM-NA path {
+.AM-NA path,
+.AM-NA-ct path {
 	fill: #F00;
 }
 
-.AM-CA path {
+.AM-CA path,
+.AM-CA-ct path {
 	fill: #ce0000;
 }
 
-.AM-CR path {
+.AM-CR path,
+.AM-CR-ct path {
 	fill: #960000;
 }
 
-.AM-SA path {
+.AM-SA path,
+.AM-SA-ct path {
 	fill: #510000;
 }
 
 .AM-SA text,
+.AM-SA-ct text
 .EU-NE text,
+.EU-NE-ct text,
 .EU-SE text,
+.EU-SE-ct text,
 .EU-EE text,
+.EU-EE-ct text,
 .EU-WE text,
+.EU-WE-ct text,
 .AF-WA text,
+.AF-WA-ct text,
 .AF-EA text,
+.AF-EA-ct text,
 .AF-NA text,
+.AF-NA-ct text,
 .AF-CA text,
-.AF-SA text {
+.AF-CA-ct text,
+.AF-SA text,
+.AF-SA-ct text {
 	fill: #fff;
 }
 
-.EU-WE path {
+.EU-WE path,
+.EU-WE-ct path{
 	fill: #00f;
 }
 
-.EU-EE path {
+.EU-EE path,
+.EU-EE-ct path {
 	fill: #0000c4;
 }
 
-.EU-NE path {
+.EU-NE path,
+.EU-NE-ct path {
 	fill: #000096;
 }
 
-.EU-SE path {
+.EU-SE path,
+.EU-SE-ct path {
 	fill: #000075;
 }
 
-.AF-WA path {
+.AF-WA path,
+.AF-WA-ct path {
 	fill: #735184;
 }
 
-.AF-EA path {
+.AF-EA path,
+.AF-EA-ct path {
 	fill: #543b60;
 }
 
-.AF-NA path {
+.AF-NA path,
+.AF-NA-ct path {
 	fill: #422e4c;
 }
 
-.AF-CA path {
+.AF-CA path,
+.AF-CA-ct path {
 	fill: #291d30;
 }
 
-.AF-SA path {
+.AF-SA path,
+.AF-SA-ct path {
 	fill: #18111c;
 }
 
-.AS-ME path {
+.AS-ME path,
+.AS-ME-ct path {
 	fill: #6fb20c;
 }
 
-.AS-EA path {
+.AS-EA path,
+.AS-EA-ct path {
 	fill: #609b09;
 }
 
-.AS-SE path {
+.AS-SE path,
+.AS-SE-ct path {
 	fill: #4f7f07;
 }
 
-.AS-SA path {
+.AS-SA path,
+.AS-SA-ct path {
 	fill: #375905;
 }
 
