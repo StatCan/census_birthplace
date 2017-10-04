@@ -16,7 +16,7 @@
 	pointer-events: none;
 }
 
-.AM path {
+.AA path {
 	fill: #b20c0c;
 }
 
@@ -36,28 +36,28 @@
 	fill: #DE770E;
 }
 
-.AM-NA path,
-.AM-NA-ct path {
+.AA-NA path,
+.AA-NA-ct path {
 	fill: #F00;
 }
 
-.AM-CA path,
-.AM-CA-ct path {
+.AA-CA path,
+.AA-CA-ct path {
 	fill: #ce0000;
 }
 
-.AM-CR path,
-.AM-CR-ct path {
+.AA-CR path,
+.AA-CR-ct path {
 	fill: #960000;
 }
 
-.AM-SA path,
-.AM-SA-ct path {
+.AA-SA path,
+.AA-SA-ct path {
 	fill: #510000;
 }
 
-.AM-SA text,
-.AM-SA-ct text
+.AA-SA text,
+.AA-SA-ct text
 .EU-NE text,
 .EU-NE-ct text,
 .EU-SE text,
