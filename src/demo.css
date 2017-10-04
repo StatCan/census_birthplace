@@ -32,7 +32,8 @@
 	fill: #6fb20c;
 }
 
-.OC path {
+.OC path,
+.OC-ct path {
 	fill: #DE770E;
 }
 
