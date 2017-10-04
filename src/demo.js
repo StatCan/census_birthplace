@@ -59,7 +59,8 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         } else {
           if (
             (from === FROM_CONTINENTS && fromId !== "OUTSIDE") ||
-            (from !== FROM_CONTINENTS && fromId !== fromArg)
+            (from === FROM_OCEANIA && fromId !== "OC") ||
+            (from !== FROM_CONTINENTS && from !== FROM_OCEANIA && fromId !== fromArg)
           )
             return false;
 
