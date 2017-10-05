@@ -16,49 +16,49 @@
 	pointer-events: none;
 }
 
-.AA path {
+.CONT_AM path {
 	fill: #b20c0c;
 }
 
-.EU path {
+.CONT_EU path {
 	fill: #0c56b2;
 }
 
-.AF path {
+.CONT_AF path {
 	fill: #735184;
 }
 
-.AS path {
+.CONT_AS path {
 	fill: #6fb20c;
 }
 
-.OC path,
-.OC-ct path {
+.CONT_OC path,
+.CONT_OC-ct path {
 	fill: #DE770E;
 }
 
-.AA-NA path,
-.AA-NA-ct path {
+.AM-NA path,
+.AM-NA-ct path {
 	fill: #F00;
 }
 
-.AA-CA path,
-.AA-CA-ct path {
+.AM-CA path,
+.AM-CA-ct path {
 	fill: #ce0000;
 }
 
-.AA-CR path,
-.AA-CR-ct path {
+.AM-CR path,
+.AM-CR-ct path {
 	fill: #960000;
 }
 
-.AA-SA path,
-.AA-SA-ct path {
+.AM-SA path,
+.AM-SA-ct path {
 	fill: #510000;
 }
 
-.AA-SA text,
-.AA-SA-ct text
+.AM-SA text,
+.AM-SA-ct text
 .EU-NE text,
 .EU-NE-ct text,
 .EU-SE text,

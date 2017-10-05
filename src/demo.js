@@ -12,7 +12,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   rootI18nRoot = "src/i18n/",
   sgcDataUrl = "lib/statcan_sgc/sgc.json",
   countriesDataUrl = "lib/statcan_countries/countries.json",
-  birthplaceDataUrl = "data/census_birthplace.json",
+  birthplaceDataRootUrl = "data/census_birthplace_{{pi}}.json",
   fromContainer = d3.select(".birthplace .data.from"),
   fromChart = fromContainer.append("svg")
     .attr("id", "canada_birthplace_from"),
@@ -21,6 +21,11 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     .attr("id", "canada_birthplace_to"),
   rootI18nNs = "census_birthplace",
   canadaSgc = "01",
+  oceaniaId = "CONT_OC",
+  allGeoId = "OUTSIDE",
+  getbirthplaceDataUrl = function(pi) {
+    return birthplaceDataRootUrl.replace("{{pi}}", pi);
+  },
   getAngleFn = function(angleProp) {
     return function(d) {
       return d[angleProp] - Math.PI;
@@ -50,17 +55,17 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
             return false;
 
           if (
-            (fromType === FROM_CONTINENTS && (fromRegion || from.id === "OC")) ||
+            (fromType === FROM_CONTINENTS && (fromRegion || from.id === oceaniaId)) ||
             (fromType === FROM_CONTINENT && fromCountry && from.region && from.region.continent.id === fromArg) ||
-            (fromType === FROM_OCEANIA && fromCountry && from.continent && from.continent.id === "OC") ||
+            (fromType === FROM_OCEANIA && fromCountry && from.continent && from.continent.id === oceaniaId) ||
             (fromType === FROM_REGION && fromCountry && from.region && from.region.id === fromArg) ||
             (fromType === FROM_COUNTRY && fromCountry && from.id === fromArg)
           )
             return true;
         } else {
           if (
-            (fromType === FROM_CONTINENTS && from !== "OUTSIDE") ||
-            (fromType === FROM_OCEANIA && from.id !== "OC") ||
+            (fromType === FROM_CONTINENTS && from !== allGeoId) ||
+            (fromType === FROM_OCEANIA && from.id !== oceaniaId) ||
             (fromType !== FROM_CONTINENTS && fromType !== FROM_OCEANIA && from.id !== fromArg)
           )
             return false;
@@ -120,11 +125,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           if (fromType === FROM_CONTINENT)
             return from.region;
 
-          if (fromType === FROM_OCEANIA) {
-            return from.continent;
-          }
-
-          if (fromType === FROM_REGION || fromType === FROM_COUNTRY)
+          if (fromType === FROM_OCEANIA || fromType === FROM_REGION || fromType === FROM_COUNTRY)
             return from;
         },
         getToParent = function(to) {
@@ -354,7 +355,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       id = classes[0],
       type = classes[1];
 
-    if (type === "continent" && id === "OC") {
+    if (type === "continent" && id === oceaniaId) {
       showFrom = FROM_OCEANIA;
       showFromArg = null;
     } else {
@@ -376,10 +377,10 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     switch(e.target.id){
     case "pob":
       var id = e.target.value;
-      if (id === "OUTSIDE") {
+      if (id === allGeoId) {
         showFrom = FROM_CONTINENTS;
         showFromArg = null;
-      } else if (id === "OC") {
+      } else if (id === oceaniaId) {
         showFrom = FROM_OCEANIA;
         showFromArg = null;
       } else {
@@ -413,7 +414,7 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
   d3.queue()
     .defer(d3.json, sgcDataUrl)
     .defer(d3.json, countriesDataUrl)
-    .defer(d3.json, birthplaceDataUrl)
+    .defer(d3.json, getbirthplaceDataUrl(1))
     .await(function(error, sgcs, countries, birthplace) {
       var extra = {};
       sgcFormatter = sgc.getFormatter(sgcs);
