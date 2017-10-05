@@ -90,7 +90,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       }
     },
     getPointValue: function(d) {
-      return d.dataPoint.total;
+      return d.dataPoint[immStatus];
     },
     getMatrix: function(data) {
       var sett = this,
@@ -372,26 +372,33 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     }
     showData();
   },
-  onSelectCountry = function(e) {
-    var id = e.target.value;
-    if (id === "OUTSIDE") {
-      showFrom = FROM_CONTINENTS;
-      showFromArg = null;
-    } else if (id === "OC") {
-      showFrom = FROM_OCEANIA;
-      showFromArg = null;
-    } else {
-      if (countriesData.isContinent(id)) {
-        showFrom = FROM_CONTINENT;
-      } else if (countriesData.isRegion(id)) {
-        showFrom = FROM_REGION;
-      } else if (countriesData.isCountry(id)) {
-        showFrom = FROM_COUNTRY;
+  onSelect = function(e) {
+    switch(e.target.id){
+    case "pob":
+      var id = e.target.value;
+      if (id === "OUTSIDE") {
+        showFrom = FROM_CONTINENTS;
+        showFromArg = null;
+      } else if (id === "OC") {
+        showFrom = FROM_OCEANIA;
+        showFromArg = null;
       } else {
-        return false;
-      }
+        if (countriesData.isContinent(id)) {
+          showFrom = FROM_CONTINENT;
+        } else if (countriesData.isRegion(id)) {
+          showFrom = FROM_REGION;
+        } else if (countriesData.isCountry(id)) {
+          showFrom = FROM_COUNTRY;
+        } else {
+          return false;
+        }
 
-      showFromArg = id;
+        showFromArg = id;
+      }
+      break;
+    case "status":
+      immStatus = e.target.value;
+      break;
     }
     showData();
   },
@@ -399,6 +406,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   showFromArg = null,
   showTo = TO_PT,
   showToArg = null,
+  immStatus = "total",
   countriesData, birthplaceData, sgcFormatter, hoverTimeout;
 
 i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
@@ -423,7 +431,7 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
       $(document).on("mouseover mouseout", "#canada_birthplace_from path", onMouseOver);
       $(document).on("mouseout", "#canada_birthplace_from .data", onMouseOut);
       $(document).on("click", "#canada_birthplace_from .arcs path", onClick);
-      $(document).on("change", ".birthplace", onSelectCountry);
+      $(document).on("change", ".birthplace", onSelect);
     });
 });
 

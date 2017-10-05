@@ -56,12 +56,26 @@
 			<h1 property="name" id="wb-cont">Place of Birth, 2011 Census</h1>
 			<p id="chgnot" class="wb-inv">Changing any selection will automatically update the page content.</p>
 			<form class="row" onsubmit="return false;">
-				<div class="form-group col-md-6">
+				<div class="form-group col-md-4">
 					<label for="pob">Place of birth</label>
 					<select id="pob" class="form-control" aria-describedby="chgnot">
 						<option value="OUTSIDE">Outside Canada</option>
 					</select>
 				</div>
+				<div class="form-group col-md-4">
+					<label for="status">Immigration status</label>
+					<select id="status" class="form-control" aria-describedby="chgnot">
+						<option value="total">Total immigrant population</option>
+						<option value="total">Economic immigrant - Worker programs</option>
+						<option value="business">Economic immigrant - Business programs</option>
+						<option value="nominee">Economic immigrant - Provincial and territorial nominee programs</option>
+						<option value="sponsor">Immigrant sponsored by family</option>
+						<option value="refugee">Refugee</option>
+						<option value="bef_80">Immigrated before 1980</option>
+						<option value="other">Other immigrant</option>
+					</select>
+				</div>
+				<div class="form-group col-md-4"></div>
 			</form>
 			<a href="#chrt-dt-tbl" class="wb-inv wb-show-onfocus">Skip the interactive visual chart and move directly to the data table displaying the place of birth</a>
 			<div class="row">
