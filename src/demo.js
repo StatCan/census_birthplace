@@ -26,8 +26,9 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       return d[angleProp] - Math.PI;
     };
   },
-  getCountryI18n = function(id) {
-    return i18next.t(id, {ns: ["continent", "region", "country"]});
+  getCountryI18n = function(id, ns) {
+    ns = ns || ["continent", "region", "country"];
+    return i18next.t(id, {ns: ns});
   },
   baseSettings = {
     aspectRatio: 1,
@@ -206,7 +207,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       },
       getText: function(d) {
         if (d.endAngle - d.startAngle > 0.4) {
-          return typeof d.index === "object" ? getCountryI18n(d.index.id) : "";
+          return typeof d.index === "object" ? getCountryI18n(d.index.id, d.index.type) : "";
         }
       }
     },
@@ -288,11 +289,11 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
 
   fillPobSelect = function(pobData) {
     var pobs = pobData.indexes[0].data,
-      createOption = function(id) {
+      createOption = function(id, type) {
         var $pob = $(window.pob);
         $("<option></option>")
           .attr("value", id)
-          .text(getCountryI18n(id))
+          .text(getCountryI18n(id, type))
           .appendTo($pob);
       },
       loopCountries = function(geo) {
@@ -300,7 +301,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         for (ct = 0; ct < geo.countries.length; ct++) {
           country = geo.countries[ct];
           if (pobs.indexOf(country.id) !== -1) {
-            createOption(country.id);
+            createOption(country.id, country.type);
           }
         }
       },
@@ -308,12 +309,12 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
 
     for (c = 0; c < countriesData.continents.length; c++) {
       continent = countriesData.continents[c];
-      createOption(continent.id);
+      createOption(continent.id, continent.type);
 
       if (continent.regions) {
         for (r = 0; r < continent.regions.length; r++) {
           region = continent.regions[r];
-          createOption(region.id);
+          createOption(region.id, region.type);
 
           if (region.countries) {
             loopCountries(region);
