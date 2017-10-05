@@ -33,34 +33,34 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     aspectRatio: 1,
     filterData: function(data) {
       var sett = this,
-        to = sett.to.type,
-        from = sett.from.type,
+        toType = sett.to.type,
+        fromType = sett.from.type,
         fromArg = sett.from.arg;
       return data.filter(function(d) {
         var toId = sett.to.getValue.call(sett, d),
           toCanada = toId === canadaSgc,
           toProvince = sgc.sgc.isProvince(toId),
-          fromId = sett.from.getValue.call(sett, d),
-          fromRegion = countriesData.isRegion(fromId) ? countriesData.getRegion(fromId) : null,
-          fromCountry = countriesData.isCountry(fromId) ? countriesData.getCountry(fromId) : null;
+          from = sett.from.getValue.call(sett, d),
+          fromRegion = from.type === "region",
+          fromCountry = from.type === "country";
 
-        if (to === TO_CANADA) {
+        if (toType === TO_CANADA) {
           if (!toCanada)
             return false;
 
           if (
-            (from === FROM_CONTINENTS && (fromRegion || fromId === "OC")) ||
-            (from === FROM_CONTINENT && fromCountry && fromCountry.region && fromCountry.region.continent.id === fromArg) ||
-            (from === FROM_OCEANIA && fromCountry && fromCountry.continent && fromCountry.continent.id === "OC") ||
-            (from === FROM_REGION && fromCountry && fromCountry.region && fromCountry.region.id === fromArg) ||
-            (from === FROM_COUNTRY && fromCountry && fromCountry.id === fromArg)
+            (fromType === FROM_CONTINENTS && (fromRegion || from.id === "OC")) ||
+            (fromType === FROM_CONTINENT && fromCountry && from.region && from.region.continent.id === fromArg) ||
+            (fromType === FROM_OCEANIA && fromCountry && from.continent && from.continent.id === "OC") ||
+            (fromType === FROM_REGION && fromCountry && from.region && from.region.id === fromArg) ||
+            (fromType === FROM_COUNTRY && fromCountry && from.id === fromArg)
           )
             return true;
         } else {
           if (
-            (from === FROM_CONTINENTS && fromId !== "OUTSIDE") ||
-            (from === FROM_OCEANIA && fromId !== "OC") ||
-            (from !== FROM_CONTINENTS && from !== FROM_OCEANIA && fromId !== fromArg)
+            (fromType === FROM_CONTINENTS && from !== "OUTSIDE") ||
+            (fromType === FROM_OCEANIA && from.id !== "OC") ||
+            (fromType !== FROM_CONTINENTS && fromType !== FROM_OCEANIA && from.id !== fromArg)
           )
             return false;
 
@@ -73,6 +73,13 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     },
     from: {
       getValue: function(d) {
+        if (countriesData.isContinent(d.pobId)) {
+          return countriesData.getContinent(d.pobId);
+        } else if (countriesData.isRegion(d.pobId)) {
+          return countriesData.getRegion(d.pobId);
+        } else if (countriesData.isCountry(d.pobId)) {
+          return countriesData.getCountry(d.pobId);
+        }
         return d.pobId;
       }
     },
@@ -104,30 +111,20 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         },
         getFromParent = function(from) {
           if (fromType === FROM_CONTINENTS) {
-            if (countriesData.isRegion(from))
-              return countriesData.getRegion(from).continent;
-            return countriesData.getContinent(from);
+            if (from.type === "region")
+              return from.continent;
+            return from;
           }
 
           if (fromType === FROM_CONTINENT)
-            return countriesData.getCountry(from).region;
+            return from.region;
 
-          if (fromType === FROM_OCEANIA)
-            return countriesData.getCountry(from);
+          if (fromType === FROM_OCEANIA) {
+            return from.continent;
+          }
 
-          if (fromType === FROM_REGION)
-            return countriesData.getCountry(from);
-
-          if (fromType === FROM_COUNTRY)
-            return countriesData.getCountry(from);
-        },
-        getFrom = function(from) {
-          if (countriesData.isContinent(from))
-            return countriesData.getContinent(from);
-          if (countriesData.isRegion(from))
-            return countriesData.getRegion(from);
-          if (countriesData.isCountry(from))
-            return countriesData.getCountry(from);
+          if (fromType === FROM_REGION || fromType === FROM_COUNTRY)
+            return from;
         },
         getToParent = function(to) {
           return to;
@@ -136,11 +133,9 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
 
       loopData(function(d, to, from) {
         var parent = toType === TO_CANADA ? getFromParent(from) : getToParent(to),
-          fromObj = getFrom(from),
           parentIndex = topLevel.indexOf(parent);
 
         if (parentIndex === -1) {
-            //this value is never used
           parentIndex = topLevel.length;
           topLevel.push(parent);
         }
@@ -148,8 +143,8 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         if (tos.indexOf(to) === -1)
           tos.push(to);
 
-        if (froms.indexOf(fromObj) === -1)
-          froms.push(fromObj);
+        if (froms.indexOf(from) === -1)
+          froms.push(from);
       });
 
       if (toType === TO_CANADA) {
@@ -170,22 +165,17 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
 
       loopData(function(d, to, from) {
         var parent = toType === TO_CANADA ? getFromParent(from) : getToParent(to),
-          fromObj = getFrom(from),
           parentIndex = topLevel.indexOf(parent),
           fromIndex, toIndex;
 
         if (toType === TO_CANADA) {
-          fromIndex = indexes[1].indexOf(fromObj);
+          fromIndex = indexes[1].indexOf(from);
           toIndex = indexes[0].indexOf(to);
           matrix[parentIndex][toIndex][fromIndex] = sett.getPointValue.call(sett, d);
-          //TODO: Remove when using real data
-          //matrix[parentIndex][toIndex][fromIndex] = Math.round(Math.random() * 200);
         } else {
-          fromIndex = indexes[0].indexOf(fromObj);
+          fromIndex = indexes[0].indexOf(from);
           toIndex = indexes[1].indexOf(to);
           matrix[parentIndex][fromIndex][toIndex] = sett.getPointValue.call(sett, d);
-          //TODO: Remove when using real data
-          //matrix[parentIndex][fromIndex][toIndex] = Math.round(Math.random() * 200);
         }
       });
       return {
@@ -256,19 +246,20 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       xIndexes = data.indexes[0].data,
       yIndexes = data.indexes[1].data,
       props = Object.keys(data.values),
-      newObj, x, y, z, id;
+      newObj, x, y, z, dataId, pobId;
 
     for (x = 0; x < xIndexes.length; x ++) {
+      pobId = xIndexes[x];
       for(y = 0; y < yIndexes.length; y++) {
-        id = data.matrix[x][y];
+        dataId = data.matrix[x][y];
         newObj = {
-          pobId: xIndexes[x],
+          pobId: pobId,
           sgcId: yIndexes[y],
           dataPoint: {}
         };
 
         for (z = 0; z < props.length; z++) {
-          newObj.dataPoint[props[z]] = data.values[props[z]][id];
+          newObj.dataPoint[props[z]] = data.values[props[z]][dataId];
         }
         newData.push(newObj);
       }
