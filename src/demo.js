@@ -23,9 +23,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   canadaSgc = "01",
   oceaniaId = "CONT_OC",
   allGeoId = "OUTSIDE",
-  getbirthplaceDataUrl = function(pi) {
-    return birthplaceDataRootUrl.replace("{{pi}}", pi);
-  },
+  immigrationPeriodCount = 7,
   getAngleFn = function(angleProp) {
     return function(d) {
       return d[angleProp] - Math.PI;
@@ -243,6 +241,31 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       }
     }
   },
+  getImmigrationPeriod = function(immId) {
+    var getbirthplaceDataUrl = function(pi) {
+        return birthplaceDataRootUrl.replace("{{pi}}", (pi + 1));
+      },
+      cb = function() {
+        fromSettings.data = birthplaceData[immId];
+        toSettings.data = birthplaceData[immId];
+        showData();
+      };
+
+    if (isNaN(immId) || immId >= immigrationPeriodCount)
+      return false;
+
+    if (birthplaceData[immId] !== undefined) {
+      cb();
+    } else {
+      d3.queue()
+        .defer(d3.json, getbirthplaceDataUrl(immId))
+        .await(function(error, birthplace) {
+          birthplaceData[immId] = processData.call(baseSettings, birthplace);
+          fillPobSelect(birthplace);
+          cb();
+        });
+    }
+  },
   processData = function(data) {
     var newData = [],
       xIndexes = data.indexes[0].data,
@@ -290,8 +313,8 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
 
   fillPobSelect = function(pobData) {
     var pobs = pobData.indexes[0].data,
+      $pob = $(window.pob),
       createOption = function(id, type) {
-        var $pob = $(window.pob);
         $("<option></option>")
           .attr("value", id)
           .text(getCountryI18n(id, type))
@@ -307,6 +330,8 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         }
       },
       c, continent, r, region;
+
+    $pob.find("option:gt(0)").remove();
 
     for (c = 0; c < countriesData.continents.length; c++) {
       continent = countriesData.continents[c];
@@ -400,6 +425,9 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     case "status":
       immStatus = e.target.value;
       break;
+    case "immperiod":
+      getImmigrationPeriod(parseInt(e.target.value, 10));
+      break;
     }
     showData();
   },
@@ -408,26 +436,21 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   showTo = TO_PT,
   showToArg = null,
   immStatus = "total",
-  countriesData, birthplaceData, sgcFormatter, hoverTimeout;
+  birthplaceData = Array(immigrationPeriodCount),
+  countriesData, sgcFormatter, hoverTimeout;
 
 i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
   d3.queue()
     .defer(d3.json, sgcDataUrl)
     .defer(d3.json, countriesDataUrl)
-    .defer(d3.json, getbirthplaceDataUrl(1))
-    .await(function(error, sgcs, countries, birthplace) {
-      var extra = {};
+    .await(function(error, sgcs, countries) {
       sgcFormatter = sgc.getFormatter(sgcs);
       countriesData = statcan_countries(countries);
-      birthplaceData = processData.call(baseSettings, birthplace);
-      fillPobSelect(birthplace);
 
-      extra.data = birthplaceData;
+      fromSettings = $.extend(true, {}, baseSettings, fromSettings);
+      toSettings = $.extend(true, {}, baseSettings, toSettings);
 
-      fromSettings = $.extend(true, {}, baseSettings, fromSettings, extra);
-      toSettings = $.extend(true, {}, baseSettings, toSettings, extra);
-
-      showData();
+      getImmigrationPeriod(0);
 
       $(document).on("mouseover mouseout", "#canada_birthplace_from path", onMouseOver);
       $(document).on("mouseout", "#canada_birthplace_from .data", onMouseOut);
