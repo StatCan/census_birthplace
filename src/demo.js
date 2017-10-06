@@ -388,7 +388,11 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     }
 
     svg.select(".hover_from")
-      .text(getCountryI18n(from.id, from.type));
+      .text(i18next.t("flow", {
+        ns: "census_birthplace",
+        from: getCountryI18n(from.id, from.type),
+        to: sgcFormatter.format("01")
+      }));
 
     svg.select(".hover_value")
       .text(value);
