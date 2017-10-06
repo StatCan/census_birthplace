@@ -307,6 +307,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
 
     toChart.select(".data").remove();
     fromChart.select(".data").remove();
+    clearMouseOverText();
     chordChart(fromChart, fromSettings);
     chordChart(toChart, toSettings);
   },
@@ -364,6 +365,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       if (obj.source) {
         d3.select("." + obj.source.index.id).classed(hoverClass, true);
       }
+      onMouseOverText(e);
       break;
     case "mouseout":
       hoverTimeout = setTimeout(function() {
@@ -371,6 +373,28 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       }, 100);
       return false;
     }
+  },
+  onMouseOverText = function(e) {
+    var d = d3.select(e.target).datum(),
+      svg = d3.select(e.target.ownerSVGElement),
+      from, value;
+
+    if (d.index) {
+      from = d.index;
+      value = d.value.in;
+    } else {
+      from = d.source.category;
+      value = d.source.value;
+    }
+
+    svg.select(".hover_from")
+      .text(getCountryI18n(from.id, from.type));
+
+    svg.select(".hover_value")
+      .text(value);
+  },
+  clearMouseOverText = function() {
+    d3.selectAll(".hover tspan").text("");
   },
   onMouseOut = function() {
     fromChart.select(".data").classed("hover", false);
@@ -444,11 +468,27 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
     .defer(d3.json, sgcDataUrl)
     .defer(d3.json, countriesDataUrl)
     .await(function(error, sgcs, countries) {
+      var createHover = function(svg) {
+        var hoverText = svg.append("text")
+          .attr("class", "hover");
+
+        hoverText.append("tspan")
+        .attr("dy", "1em")
+          .attr("class", "hover_from");
+
+        hoverText.append("tspan")
+          .attr("x", 0)
+          .attr("dy", "1.5em")
+          .attr("class", "hover_value");
+      };
       sgcFormatter = sgc.getFormatter(sgcs);
       countriesData = statcan_countries(countries);
 
       fromSettings = $.extend(true, {}, baseSettings, fromSettings);
       toSettings = $.extend(true, {}, baseSettings, toSettings);
+
+      createHover(fromChart);
+      createHover(toChart);
 
       getImmigrationPeriod(0);
 
