@@ -57,26 +57,9 @@
 	fill: #510000;
 }
 
-.AM-SA text,
-.AM-SA-ct text,
-.EU-NE text,
-.EU-NE-ct text,
-.EU-SE text,
-.EU-SE-ct text,
-.EU-EE text,
-.EU-EE-ct text,
-.EU-WE text,
-.EU-WE-ct text,
-.AF-WA text,
-.AF-WA-ct text,
-.AF-EA text,
-.AF-EA-ct text,
-.AF-NA text,
-.AF-NA-ct text,
-.AF-CA text,
-.AF-CA-ct text,
-.AF-SA text,
-.AF-SA-ct text {
+.continent text,
+.region text,
+.country text {
 	fill: #fff;
 }
 
