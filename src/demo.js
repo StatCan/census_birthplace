@@ -474,7 +474,8 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
     .await(function(error, sgcs, countries) {
       var createHover = function(svg) {
         var hoverText = svg.append("text")
-          .attr("class", "hover");
+          .attr("class", "hover")
+          .attr("aria-hidden", "true");
 
         hoverText.append("tspan")
         .attr("dy", "1em")

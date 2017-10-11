@@ -126,6 +126,7 @@ this.chordChart = function(svg, settings) {
             parent.append("text")
               .attr("dy", 15)
               .attr("dx", 5)
+              .attr("aria-hidden", "true")
                 .append("textPath")
                 .attr("href", function() {
                   return "#" + arcId.apply(this, arguments);
