@@ -320,9 +320,16 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     var pobs = pobData.indexes[0].data,
       $pob = $(window.pob || document.getElementById("pob")),
       createOption = function(id, type) {
+        var text = getCountryI18n(id, type);
+
+        if (type === "region") {
+          text = "&emsp;" + text;
+        } else if (type === "country") {
+          text = "&emsp;&emsp;" + text;
+        }
         $("<option></option>")
           .attr("value", id)
-          .text(getCountryI18n(id, type))
+          .html(text)
           .appendTo($pob);
       },
       loopCountries = function(geo) {
