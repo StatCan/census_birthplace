@@ -35,6 +35,9 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   },
   baseSettings = {
     aspectRatio: 1,
+    margin: {
+      top: 20
+    },
     filterData: function(data) {
       var sett = this,
         toType = sett.to.type,
