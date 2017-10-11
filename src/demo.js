@@ -314,7 +314,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
 
   fillPobSelect = function(pobData) {
     var pobs = pobData.indexes[0].data,
-      $pob = $(window.pob),
+      $pob = $(window.pob || document.getElementById("pob")),
       createOption = function(id, type) {
         $("<option></option>")
           .attr("value", id)
