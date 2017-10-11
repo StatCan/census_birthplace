@@ -227,7 +227,8 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   toSettings = {
     arcs: {
       getClass: function(d) {
-        return "sgc_" + d.index;
+        if (typeof d.index === "string" && d.index !== "OUTSIDE")
+          return "sgc_" + d.index;
       },
       getText: function(d) {
         if (d.endAngle - d.startAngle > 0.4) {
@@ -365,7 +366,6 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       if (obj.source) {
         d3.select("." + obj.source.index.id).classed(hoverClass, true);
       }
-      onMouseOverText(e);
       break;
     case "mouseout":
       hoverTimeout = setTimeout(function() {
@@ -374,34 +374,52 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       return false;
     }
   },
+  onMouseOut = function() {
+    fromChart.select(".data").classed("hover", false);
+  },
   onMouseOverText = function(e) {
     var d = d3.select(e.target).datum(),
       svg = d3.select(e.target.ownerSVGElement),
-      from, value;
+      from, to, value, text;
 
-    if (d.index) {
-      from = d.index;
-      value = d.value.in;
-    } else {
-      from = d.source.category;
-      value = d.source.value;
+    if (e.target.parentNode.className.baseVal !== "") {
+      if (e.target.ownerSVGElement.id === "canada_birthplace_from") {
+        if (d.index) {
+          from = d.index;
+          value = d.value.in;
+        } else {
+          from = d.source.category;
+          value = d.source.value;
+        }
+        text = i18next.t("flow", {
+          ns: "census_birthplace",
+          from: getCountryI18n(from.id, from.type),
+          to: sgcFormatter.format("01")
+        });
+      } else {
+        if (d.index) {
+          to = d.index;
+          value = d.value.in;
+        } else {
+          to = d.source.category;
+          value = d.source.value;
+        }
+        text = i18next.t("flow", {
+          ns: "census_birthplace",
+          from: getCountryI18n(showFromArg) || i18next.t("OUTSIDE", {ns: "census_birthplace"}),
+          to: sgcFormatter.format(to)
+        });
+      }
+
+      svg.select(".hover_from")
+        .text(text);
+
+      svg.select(".hover_value")
+        .text(value);
     }
-
-    svg.select(".hover_from")
-      .text(i18next.t("flow", {
-        ns: "census_birthplace",
-        from: getCountryI18n(from.id, from.type),
-        to: sgcFormatter.format("01")
-      }));
-
-    svg.select(".hover_value")
-      .text(value);
   },
   clearMouseOverText = function() {
     d3.selectAll(".hover tspan").text("");
-  },
-  onMouseOut = function() {
-    fromChart.select(".data").classed("hover", false);
   },
   onClick = function(e) {
     var classes = e.target.parentNode.className.baseVal.split(" "),
@@ -499,6 +517,7 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
 
       $(document).on("mouseover mouseout", "#canada_birthplace_from path", onMouseOver);
       $(document).on("mouseout", "#canada_birthplace_from .data", onMouseOut);
+      $(document).on("mouseover", ".birthplace svg path", onMouseOverText);
       $(document).on("click", "#canada_birthplace_from .arcs path", onClick);
       $(document).on("change", ".birthplace", onSelect);
     });

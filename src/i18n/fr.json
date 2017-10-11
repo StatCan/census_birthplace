@@ -1,7 +1,8 @@
 {
 	"fr": {
 		"census_birthplace": {
-			"flow": "{{from}} to {{to}}"
+			"flow": "{{from}} à {{to}}",
+			"OUTSIDE": "Monde"
 		}
 	}
 }
