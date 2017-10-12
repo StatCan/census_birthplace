@@ -1,4 +1,4 @@
-const FROM_CONTINENTS = 1,
+const FROM_WORLD = 1,
   FROM_CONTINENT = 2,
   FROM_REGION = 3,
   FROM_COUNTRY = 4,
@@ -41,41 +41,43 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     filterData: function(data) {
       var sett = this,
         toType = sett.to.type,
+        toArg = sett.to.arg,
         fromType = sett.from.type,
         fromArg = sett.from.arg;
+
       return data.filter(function(d) {
         var toId = sett.to.getValue.call(sett, d),
-          toCanada = toId === canadaSgc,
-          toProvince = sgc.sgc.isProvince(toId),
+          isCanada = toId === canadaSgc,
+          isProvince = sgc.sgc.isProvince(toId),
           from = sett.from.getValue.call(sett, d),
           fromRegion = from.type === "region",
           fromCountry = from.type === "country";
 
-        if (toType === TO_CANADA) {
-          if (!toCanada)
-            return false;
-
+        if (sett.name === "from") {
           if (
-            (fromType === FROM_CONTINENTS && (fromRegion || from.id === oceaniaId)) ||
-            (fromType === FROM_CONTINENT && fromCountry && from.region && from.region.continent.id === fromArg) ||
-            (fromType === FROM_OCEANIA && fromCountry && from.continent && from.continent.id === oceaniaId) ||
-            (fromType === FROM_REGION && fromCountry && from.region && from.region.id === fromArg) ||
-            (fromType === FROM_COUNTRY && fromCountry && from.id === fromArg)
+            (toType === TO_CANADA && !isCanada) ||
+            ((toType === TO_PT || toType === TO_CMA) && toId !== toArg) ||
+            (fromType === FROM_WORLD && (!fromRegion && from.id !== oceaniaId)) ||
+            (fromType === FROM_CONTINENT && (!fromCountry || !from.region || from.region.continent.id !== fromArg)) ||
+            (fromType === FROM_OCEANIA && (!fromCountry || !from.continent || from.continent.id !== oceaniaId)) ||
+            (fromType === FROM_REGION && (!fromCountry || !from.region || from.region.id !== fromArg)) ||
+            (fromType === FROM_COUNTRY && (!fromCountry || from.id !== fromArg))
           )
-            return true;
+            return false;
         } else {
           if (
-            (fromType === FROM_CONTINENTS && from !== allGeoId) ||
+            isCanada ||
+            (toType === TO_CANADA && !isProvince) ||
+            (toType === TO_PT && (isProvince || isCanada || sgc.sgc.getProvince(toId) !== toArg)) ||
+            (toType === TO_CMA && toId !== toArg) ||
+            (fromType === FROM_WORLD && from !== allGeoId) ||
             (fromType === FROM_OCEANIA && from.id !== oceaniaId) ||
-            (fromType !== FROM_CONTINENTS && fromType !== FROM_OCEANIA && from.id !== fromArg)
+            (fromType !== FROM_WORLD && fromType !== FROM_OCEANIA && from.id !== fromArg)
           )
             return false;
-
-          if (
-            toId !== "01"
-          )
-            return true;
         }
+
+        return true;
       });
     },
     from: {
@@ -101,7 +103,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     getMatrix: function(data) {
       var sett = this,
         dataLength = data.length,
-        toType = sett.to.type,
+        chartName = sett.name,
         fromType = sett.from.type,
         topLevel = [],
         tos = [],
@@ -117,7 +119,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           }
         },
         getFromParent = function(from) {
-          if (fromType === FROM_CONTINENTS) {
+          if (fromType === FROM_WORLD) {
             if (from.type === "region")
               return from.continent;
             return from;
@@ -135,7 +137,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         m, matrix, t;
 
       loopData(function(d, to, from) {
-        var parent = toType === TO_CANADA ? getFromParent(from) : getToParent(to),
+        var parent = chartName === "from" ? getFromParent(from) : getToParent(to),
           parentIndex = topLevel.indexOf(parent);
 
         if (parentIndex === -1) {
@@ -150,7 +152,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           froms.push(from);
       });
 
-      if (toType === TO_CANADA) {
+      if (chartName === "from") {
         indexes.push(indexes.concat(topLevel, tos));
         indexes.push(froms);
       } else {
@@ -167,11 +169,11 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       }
 
       loopData(function(d, to, from) {
-        var parent = toType === TO_CANADA ? getFromParent(from) : getToParent(to),
+        var parent = chartName === "from" ? getFromParent(from) : getToParent(to),
           parentIndex = topLevel.indexOf(parent),
           fromIndex, toIndex;
 
-        if (toType === TO_CANADA) {
+        if (chartName === "from") {
           fromIndex = indexes[1].indexOf(from);
           toIndex = indexes[0].indexOf(to);
           matrix[parentIndex][toIndex][fromIndex] = sett.getPointValue.call(sett, d);
@@ -188,10 +190,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     }
   },
   fromSettings = {
-    to: {
-      type: TO_CANADA
-    },
-
+    name: "from",
     arcs: {
       getClass: function(d) {
         var cl = "";
@@ -228,6 +227,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     endAngle: getAngleFn("endAngle")
   },
   toSettings = {
+    name: "to",
     arcs: {
       getClass: function(d) {
         if (typeof d.index === "string" && d.index !== "OUTSIDE")
@@ -298,6 +298,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   showData = function() {
     fromSettings.from.type = showFrom;
     toSettings.from.type = showFrom;
+    fromSettings.to.type = showTo;
     toSettings.to.type = showTo;
 
     if (showFromArg) {
@@ -306,7 +307,8 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     }
 
     if (showToArg) {
-      toSettings.from.arg = showToArg;
+      fromSettings.to.arg = showToArg;
+      toSettings.to.arg = showToArg;
     }
 
     toChart.select(".data").remove();
@@ -404,7 +406,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         text = i18next.t("flow", {
           ns: "census_birthplace",
           from: getCountryI18n(from.id, from.type),
-          to: sgcFormatter.format("01")
+          to: sgcFormatter.format(showToArg || canadaSgc)
         });
       } else {
         if (d.index) {
@@ -459,7 +461,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     case "pob":
       var id = e.target.value;
       if (id === allGeoId) {
-        showFrom = FROM_CONTINENTS;
+        showFrom = FROM_WORLD;
         showFromArg = null;
       } else if (id === oceaniaId) {
         showFrom = FROM_OCEANIA;
@@ -487,9 +489,9 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     }
     showData();
   },
-  showFrom = FROM_CONTINENTS,
+  showFrom = FROM_WORLD,
   showFromArg = null,
-  showTo = TO_PT,
+  showTo = TO_CANADA,
   showToArg = null,
   immStatus = "total",
   birthplaceData = Array(immigrationPeriodCount),
@@ -506,7 +508,7 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
           .attr("aria-hidden", "true");
 
         hoverText.append("tspan")
-        .attr("dy", "1em")
+          .attr("dy", "1em")
           .attr("class", "hover_from");
 
         hoverText.append("tspan")
@@ -514,7 +516,7 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
           .attr("dy", "1.5em")
           .attr("class", "hover_value");
       };
-      sgcFormatter = sgc.getFormatter(sgcs);
+      sgcFormatter = sgc.getFormatter(sgcs, {type: false, province: false});
       countriesData = statcan_countries(countries);
 
       fromSettings = $.extend(true, {}, baseSettings, fromSettings);
