@@ -230,8 +230,15 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     name: "to",
     arcs: {
       getClass: function(d) {
-        if (typeof d.index === "string" && d.index !== "OUTSIDE")
-          return "sgc_" + d.index;
+        var cl;
+        if (typeof d.index === "string" && d.index !== "OUTSIDE") {
+          cl = "sgc_" + d.index;
+
+          if (!sgc.sgc.isProvince(d.index))
+            cl += " " + "pt_" + sgc.sgc.getProvince(d.index);
+        }
+
+        return cl;
       },
       getText: function(d) {
         if (d.endAngle - d.startAngle > 0.4) {
@@ -241,7 +248,12 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     },
     ribbons: {
       getClass: function(d) {
-        return "sgc_" + d.source.index;
+        var cl = "sgc_" + d.source.index;
+
+        if (!sgc.sgc.isProvince(d.source.index))
+          cl += " " + "pt_" + sgc.sgc.getProvince(d.source.index);
+
+        return cl;
       }
     }
   },
