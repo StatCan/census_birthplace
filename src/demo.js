@@ -266,6 +266,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         .await(function(error, birthplace) {
           birthplaceData[immId] = processData.call(baseSettings, birthplace);
           fillPobSelect(birthplace);
+          fillResidenceSelect(birthplace);
           cb();
         });
     }
@@ -365,6 +366,23 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       }
     }
   },
+  fillResidenceSelect = function(pobData) {
+    var $dest = $(window.dest || document.getElementById("dest")),
+      s, id, text;
+    for (s = 0; s < sgcData.length; s++) {
+      id = sgcData[s].sgcId;
+
+      if (id === canadaSgc || pobData.indexes[1].data.indexOf(id) === -1)
+        continue;
+
+      text = sgcFormatter.format(id);
+
+      $("<option></option>")
+        .attr("value", id)
+        .html(text)
+        .appendTo($dest);
+    }
+  },
   onMouseOver = function(e) {
     var hoverClass = "hovering",
       obj;
@@ -457,9 +475,10 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     showData();
   },
   onSelect = function(e) {
+    var id;
     switch(e.target.id){
     case "pob":
-      var id = e.target.value;
+      id = e.target.value;
       if (id === allGeoId) {
         showFrom = FROM_WORLD;
         showFromArg = null;
@@ -480,6 +499,17 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         showFromArg = id;
       }
       break;
+    case "dest":
+      id = e.target.value;
+
+      if (id === canadaSgc) {
+        showTo = TO_CANADA;
+      } else {
+        showToArg = id;
+        showTo = sgc.sgc.isProvince(showToArg) ? TO_PT : TO_CMA;
+      }
+
+      break;
     case "status":
       immStatus = e.target.value;
       break;
@@ -495,7 +525,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   showToArg = null,
   immStatus = "total",
   birthplaceData = Array(immigrationPeriodCount),
-  countriesData, sgcFormatter, hoverTimeout;
+  countriesData, sgcData, sgcFormatter, hoverTimeout;
 
 i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
   d3.queue()
@@ -516,6 +546,7 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
           .attr("dy", "1.5em")
           .attr("class", "hover_value");
       };
+      sgcData = sgcs.sgcs;
       sgcFormatter = sgc.getFormatter(sgcs, {type: false, province: false});
       countriesData = statcan_countries(countries);
 
