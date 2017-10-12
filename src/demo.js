@@ -13,9 +13,10 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   sgcDataUrl = "lib/statcan_sgc/sgc.json",
   countriesDataUrl = "lib/statcan_countries/countries.json",
   birthplaceDataRootUrl = "data/census_birthplace_{{pi}}.json",
+  fromId = "canada_birthplace_from",
   fromContainer = d3.select(".birthplace .data.from"),
   fromChart = fromContainer.append("svg")
-    .attr("id", "canada_birthplace_from"),
+    .attr("id", fromId),
   toContainer = d3.select(".birthplace .data.to"),
   toChart = toContainer.append("svg")
     .attr("id", "canada_birthplace_to"),
@@ -411,7 +412,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       break;
     case "mouseout":
       hoverTimeout = setTimeout(function() {
-        $("#canada_birthplace_from .data").trigger("mouseout");
+        $("#" + fromId + ".data").trigger("mouseout");
       }, 100);
       return false;
     }
@@ -425,7 +426,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       from, to, value, text;
 
     if (e.target.parentNode.className.baseVal !== "") {
-      if (e.target.ownerSVGElement.id === "canada_birthplace_from") {
+      if (e.target.ownerSVGElement.id === fromId) {
         if (d.index) {
           from = d.index;
           value = d.value.in;
@@ -434,7 +435,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           value = d.source.value;
         }
         text = i18next.t("flow", {
-          ns: "census_birthplace",
+          ns: rootI18nNs,
           from: getCountryI18n(from.id, from.type),
           to: sgcFormatter.format(showToArg || canadaSgc)
         });
@@ -447,8 +448,8 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           value = d.source.value;
         }
         text = i18next.t("flow", {
-          ns: "census_birthplace",
-          from: getCountryI18n(showFromArg) || i18next.t("OUTSIDE", {ns: "census_birthplace"}),
+          ns: rootI18nNs,
+          from: getCountryI18n(showFromArg) || i18next.t("OUTSIDE", {ns: rootI18nNs}),
           to: sgcFormatter.format(to)
         });
       }
@@ -464,25 +465,36 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     d3.selectAll(".hover tspan").text("");
   },
   onClick = function(e) {
-    var classes = e.target.parentNode.className.baseVal.split(" "),
-      id = classes[0],
+    var target = e.target,
+      classes = target.parentNode.className.baseVal.split(" "),
+      id, type;
+
+    if (target.ownerSVGElement.id === fromId) {
+      id = classes[0];
       type = classes[1];
 
-    if (type === "continent" && id === oceaniaId) {
-      showFrom = FROM_OCEANIA;
-      showFromArg = null;
-    } else {
-      switch (type) {
-      case "continent":
-        showFrom = FROM_CONTINENT;
-        break;
-      case "region":
-        showFrom = FROM_REGION;
-        break;
-      case "country":
-        showFrom = FROM_COUNTRY;
+      if (type === "continent" && id === oceaniaId) {
+        showFrom = FROM_OCEANIA;
+        showFromArg = null;
+      } else {
+        switch (type) {
+        case "continent":
+          showFrom = FROM_CONTINENT;
+          break;
+        case "region":
+          showFrom = FROM_REGION;
+          break;
+        case "country":
+          showFrom = FROM_COUNTRY;
+        }
+        showFromArg = id;
       }
-      showFromArg = id;
+    } else {
+      id = classes[0].replace("sgc_", "");
+      if (showTo === TO_CANADA) {
+        showTo = TO_PT;
+      }
+      showToArg = id;
     }
     showData();
   },
@@ -573,7 +585,7 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
       $(document).on("mouseover mouseout", "#canada_birthplace_from path", onMouseOver);
       $(document).on("mouseout", "#canada_birthplace_from .data", onMouseOut);
       $(document).on("mouseover", ".birthplace svg path", onMouseOverText);
-      $(document).on("click", "#canada_birthplace_from .arcs path", onClick);
+      $(document).on("click", ".birthplace svg .arcs path", onClick);
       $(document).on("change", ".birthplace", onSelect);
     });
 });
