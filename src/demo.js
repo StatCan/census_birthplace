@@ -412,7 +412,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       break;
     case "mouseout":
       hoverTimeout = setTimeout(function() {
-        $("#" + fromId + ".data").trigger("mouseout");
+        $("#" + fromId + " .data").trigger("mouseout");
       }, 100);
       return false;
     }
