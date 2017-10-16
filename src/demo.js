@@ -310,19 +310,19 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     return newData;
   },
   showData = function() {
-    fromSettings.from.type = showFrom;
-    toSettings.from.type = showFrom;
-    fromSettings.to.type = showTo;
-    toSettings.to.type = showTo;
+    fromSettings.from.type = show.from.type;
+    toSettings.from.type = show.from.type;
+    fromSettings.to.type = show.to.type;
+    toSettings.to.type = show.to.type;
 
-    if (showFromArg) {
-      fromSettings.from.arg = showFromArg;
-      toSettings.from.arg = showFromArg;
+    if (show.from.arg) {
+      fromSettings.from.arg = show.from.arg;
+      toSettings.from.arg = show.from.arg;
     }
 
-    if (showToArg) {
-      fromSettings.to.arg = showToArg;
-      toSettings.to.arg = showToArg;
+    if (show.to.type) {
+      fromSettings.to.arg = show.to.arg;
+      toSettings.to.arg = show.to.arg;
     }
 
     toChart.select(".data").remove();
@@ -437,7 +437,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         text = i18next.t("flow", {
           ns: rootI18nNs,
           from: getCountryI18n(from.id, from.type),
-          to: sgcFormatter.format(showToArg || canadaSgc)
+          to: sgcFormatter.format(show.to.arg || canadaSgc)
         });
       } else {
         if (d.index) {
@@ -449,7 +449,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         }
         text = i18next.t("flow", {
           ns: rootI18nNs,
-          from: getCountryI18n(showFromArg) || i18next.t("OUTSIDE", {ns: rootI18nNs}),
+          from: getCountryI18n(show.from.arg) || i18next.t("OUTSIDE", {ns: rootI18nNs}),
           to: sgcFormatter.format(to)
         });
       }
@@ -474,27 +474,27 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       type = classes[1];
 
       if (type === "continent" && id === oceaniaId) {
-        showFrom = FROM_OCEANIA;
-        showFromArg = null;
+        show.from.type = FROM_OCEANIA;
+        show.from.arg = null;
       } else {
         switch (type) {
         case "continent":
-          showFrom = FROM_CONTINENT;
+          show.from.type = FROM_CONTINENT;
           break;
         case "region":
-          showFrom = FROM_REGION;
+          show.from.type = FROM_REGION;
           break;
         case "country":
-          showFrom = FROM_COUNTRY;
+          show.from.type = FROM_COUNTRY;
         }
-        showFromArg = id;
+        show.from.arg = id;
       }
     } else {
       id = classes[0].replace("sgc_", "");
-      if (showTo === TO_CANADA) {
-        showTo = TO_PT;
+      if (show.to.type === TO_CANADA) {
+        show.to.type = TO_PT;
       }
-      showToArg = id;
+      show.to.arg = id;
     }
     showData();
   },
@@ -504,33 +504,33 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     case "pob":
       id = e.target.value;
       if (id === allGeoId) {
-        showFrom = FROM_WORLD;
-        showFromArg = null;
+        show.from.type = FROM_WORLD;
+        show.from.arg = null;
       } else if (id === oceaniaId) {
-        showFrom = FROM_OCEANIA;
-        showFromArg = null;
+        show.from.type = FROM_OCEANIA;
+        show.from.arg = null;
       } else {
         if (countriesData.isContinent(id)) {
-          showFrom = FROM_CONTINENT;
+          show.from.type = FROM_CONTINENT;
         } else if (countriesData.isRegion(id)) {
-          showFrom = FROM_REGION;
+          show.from.type = FROM_REGION;
         } else if (countriesData.isCountry(id)) {
-          showFrom = FROM_COUNTRY;
+          show.from.type = FROM_COUNTRY;
         } else {
           return false;
         }
 
-        showFromArg = id;
+        show.from.arg = id;
       }
       break;
     case "dest":
       id = e.target.value;
 
       if (id === canadaSgc) {
-        showTo = TO_CANADA;
+        show.to.type = TO_CANADA;
       } else {
-        showToArg = id;
-        showTo = sgc.sgc.isProvince(showToArg) ? TO_PT : TO_CMA;
+        show.to.arg = id;
+        show.to.type = sgc.sgc.isProvince(show.to.arg) ? TO_PT : TO_CMA;
       }
 
       break;
@@ -543,10 +543,16 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     }
     showData();
   },
-  showFrom = FROM_WORLD,
-  showFromArg = null,
-  showTo = TO_CANADA,
-  showToArg = null,
+  show = {
+    from: {
+      type: FROM_WORLD,
+      arg: null
+    },
+    to: {
+      type: TO_CANADA,
+      arg: null
+    }
+  },
   immStatus = "total",
   birthplaceData = Array(immigrationPeriodCount),
   countriesData, sgcData, sgcFormatter, hoverTimeout;
