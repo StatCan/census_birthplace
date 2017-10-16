@@ -193,6 +193,9 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   fromSettings = {
     name: "from",
     arcs: {
+      getId: function(d) {
+        return d.index.id;
+      },
       getClass: function(d) {
         var cl = "";
         if (typeof d.index === "object") {
@@ -214,6 +217,9 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       }
     },
     ribbons: {
+      getId: function(d) {
+        return d.source.category.id;
+      },
       getClass: function(d) {
         var cat = d.source.category,
           cl = cat.id + " " + cat.type;
@@ -230,6 +236,9 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   toSettings = {
     name: "to",
     arcs: {
+      getId: function(d) {
+        return d.index;
+      },
       getClass: function(d) {
         var cl;
         if (typeof d.index === "string" && d.index !== "OUTSIDE") {
@@ -248,6 +257,9 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       }
     },
     ribbons: {
+      getId: function(d) {
+        return d.target.category;
+      },
       getClass: function(d) {
         var cl = "sgc_" + d.source.index;
 

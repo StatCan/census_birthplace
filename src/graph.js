@@ -28,6 +28,12 @@ this.chordChart = function(svg, settings) {
           sett.filterData.call(sett, sett.data) : sett.data,
         outerRadius = Math.min(innerHeight, innerWidth) / 2,
         innerRadius = outerRadius - sett.arcsWidth,
+        getArcsAngles = function(d) {
+          return [d.startAngle, d.endAngle];
+        },
+        getRibbonsAngles = function(d) {
+          return [d.source.startAngle, d.source.endAngle, d.target.startAngle, d.target.endAngle];
+        },
         mapIndexes = function(d) {
           var newD = chord(d.matrix),
             g, group, c, ch;
@@ -47,23 +53,41 @@ this.chordChart = function(svg, settings) {
           return newD;
         },
         arcTween = function(d) {
-          var i = d3.interpolate(this._current, d);
-          this._current = i(0);
-
+          var newD = getArcsAngles(d),
+            oldD = this.parentNode._current,
+            i = d3.interpolate(oldD, newD);
+          this.parentNode._current = newD;
           return function(t) {
-            return arc(i(t));
+            var d = i(t);
+            return arc({
+              startAngle: d[0],
+              endAngle: d[1]
+            });
           };
         },
+        arcsId = sett.arcs && sett.arcs.getId ? sett.arcs.getId.bind(sett) : null,
         arcsClass = sett.arcs && sett.arcs.getClass ? sett.arcs.getClass.bind(sett) : null,
         arcsText = sett.arcs && sett.arcs.getText ? sett.arcs.getText.bind(sett) : null,
         ribbonTween = function(d) {
-          var i = d3.interpolate(this._current, d);
-          this._current = i(0);
-
+          var newD = getRibbonsAngles(d),
+            oldD = this.parentNode._current,
+            i = d3.interpolate(oldD, newD);
+          this.parentNode._current = newD;
           return function(t) {
-            return ribbon(i(t));
+            var d = i(t);
+            return ribbon({
+              source: {
+                startAngle: d[0],
+                endAngle: d[1]
+              },
+              target: {
+                startAngle: d[2],
+                endAngle: d[3]
+              }
+            });
           };
         },
+        ribbonsId = sett.ribbons && sett.ribbons.getId ? sett.ribbons.getId.bind(sett) : null,
         ribbonsClass = sett.ribbons ? sett.ribbons.getClass.bind(sett) : null,
         chord = d3.multichord()
           .padAngle(sett.padding),
@@ -72,9 +96,7 @@ this.chordChart = function(svg, settings) {
           .outerRadius(outerRadius),
         ribbon = d3.ribbon()
           .radius(innerRadius),
-        arcsGroup = dataLayer.select(".arcs"),
-        ribbonsGroup = dataLayer.select(".ribbons"),
-        arcs, ribbons;
+        arcsGroup, ribbonsGroup, arcs, ribbons;
 
       if (sett.startAngle) {
         arc.startAngle(sett.startAngle.bind(sett));
@@ -93,21 +115,23 @@ this.chordChart = function(svg, settings) {
       }
       dataLayer.datum(mapIndexes(sett.getMatrix.call(sett, data)));
 
+      arcsGroup = dataLayer.select(".arcs");
       if (arcsGroup.empty()) {
         arcsGroup = dataLayer.append("g")
           .attr("class", "arcs");
       }
       arcs = arcsGroup
         .selectAll("g")
-        .data(function(chords) { return chords.groups; });
+        .data(function(chords) { return chords.groups; }, arcsId);
 
+      ribbonsGroup = dataLayer.select(".ribbons");
       if (ribbonsGroup.empty()) {
         ribbonsGroup = dataLayer.append("g")
           .attr("class", "ribbons");
       }
       ribbons = ribbonsGroup
         .selectAll("g")
-        .data(function(chords) { return chords; });
+        .data(function(chords) { return chords; }, ribbonsId);
 
       arcs
         .enter()
@@ -118,7 +142,7 @@ this.chordChart = function(svg, settings) {
               arcId = function() {
                 return svg.attr("id") + "arc" + index;
               };
-
+            this._current = getArcsAngles(d);
             parent.append("path")
               .attr("d", arc)
               .attr("id", arcId);
@@ -150,14 +174,15 @@ this.chordChart = function(svg, settings) {
         .enter()
         .append("g")
           .attr("class", ribbonsClass)
-          .each(function() {
+          .each(function(d) {
+            this._current = getRibbonsAngles(d)
             d3.select(this).append("path")
               .attr("d", ribbon);
           });
 
       ribbons
         .attr("class", ribbonsClass)
-        .each(function() {
+        .each(function(d) {
           d3.select(this).select("path")
             .transition(transition)
             .attrTween("d", ribbonTween);
