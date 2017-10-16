@@ -310,6 +310,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     return newData;
   },
   showData = function() {
+    var str = JSON.stringify(show);
     fromSettings.from.type = show.from.type;
     toSettings.from.type = show.from.type;
     fromSettings.to.type = show.to.type;
@@ -325,8 +326,11 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       toSettings.to.arg = show.to.arg;
     }
 
-    toChart.select(".data").remove();
-    fromChart.select(".data").remove();
+    if (!oldState || str !== oldState) {
+      toChart.select(".data").remove();
+      fromChart.select(".data").remove();
+      oldState = str;
+    }
     clearMouseOverText();
     chordChart(fromChart, fromSettings);
     chordChart(toChart, toSettings);
@@ -538,8 +542,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       immStatus = e.target.value;
       break;
     case "immperiod":
-      getImmigrationPeriod(parseInt(e.target.value, 10));
-      break;
+      return getImmigrationPeriod(parseInt(e.target.value, 10));
     }
     showData();
   },
@@ -555,7 +558,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   },
   immStatus = "total",
   birthplaceData = Array(immigrationPeriodCount),
-  countriesData, sgcData, sgcFormatter, hoverTimeout;
+  countriesData, sgcData, sgcFormatter, hoverTimeout, oldState;
 
 i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
   d3.queue()
