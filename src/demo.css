@@ -1,3 +1,7 @@
+form.well {
+	margin: 0px;
+}
+
 .arcs path {
 	fill: #ffdd89;
 	stroke: #000;
@@ -12,7 +16,7 @@
 }
 
 .arcs text {
-	font-size: 14px;
+	font-size: 16px;
 	pointer-events: none;
 }
 
