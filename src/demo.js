@@ -24,6 +24,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   canadaSgc = "01",
   oceaniaId = "CONT_OC",
   allGeoId = "OUTSIDE",
+  outsideCMASuffix = "-x-nie",
   immigrationPeriodCount = 7,
   getAngleFn = function(angleProp) {
     return function(d) {
@@ -33,6 +34,30 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   getCountryI18n = function(id, ns) {
     ns = ns || ["continent", "region", "country"];
     return i18next.t(id, {ns: ns});
+  },
+  getSgcI18n = function(sgcId) {
+    if (sgcId.indexOf(outsideCMASuffix) !== -1)
+      return i18next.t("out_of_cma", {
+        ns: rootI18nNs,
+        sgc: sgcFormatter.format(sgcId.substr(0,2))
+      });
+
+    return sgcFormatter.format(sgcId);
+  },
+  getToClass = function(sgcId) {
+    var cl = "sgc_" + sgcId,
+      province;
+
+    if (!sgc.sgc.isProvince(sgcId)) {
+      if (sgcId.indexOf(outsideCMASuffix) !== -1) {
+        province = sgcId.substr(0, 2);
+      } else {
+        province = sgc.sgc.getProvince(sgcId);
+      }
+      cl += " " + "pt_" + province;
+    }
+
+    return cl;
   },
   baseSettings = {
     aspectRatio: 1,
@@ -69,7 +94,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           if (
             isCanada ||
             (toType === TO_CANADA && !isProvince) ||
-            (toType === TO_PT && (isProvince || isCanada || sgc.sgc.getProvince(toId) !== toArg)) ||
+            (toType === TO_PT && (isProvince || isCanada || (toId.indexOf(outsideCMASuffix) !== -1 && toId.substr(0, 2) !== toArg) || (toId.length == 3 && sgc.sgc.getProvince(toId) !== toArg))) ||
             (toType === TO_CMA && toId !== toArg) ||
             (fromType === FROM_WORLD && from !== allGeoId) ||
             (fromType === FROM_OCEANIA && from.id !== oceaniaId) ||
@@ -242,17 +267,14 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       getClass: function(d) {
         var cl;
         if (typeof d.index === "string" && d.index !== "OUTSIDE") {
-          cl = "sgc_" + d.index;
-
-          if (!sgc.sgc.isProvince(d.index))
-            cl += " " + "pt_" + sgc.sgc.getProvince(d.index);
+          return getToClass(d.index);
         }
 
         return cl;
       },
       getText: function(d) {
         if (d.endAngle - d.startAngle > 0.4) {
-          return sgcFormatter.format(d.index);
+          return getSgcI18n(d.index);
         }
       }
     },
@@ -261,12 +283,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         return d.target.category;
       },
       getClass: function(d) {
-        var cl = "sgc_" + d.source.index;
-
-        if (!sgc.sgc.isProvince(d.source.index))
-          cl += " " + "pt_" + sgc.sgc.getProvince(d.source.index);
-
-        return cl;
+        return getToClass(d.source.index);
       }
     }
   },
@@ -466,7 +483,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         text = i18next.t("flow", {
           ns: rootI18nNs,
           from: getCountryI18n(show.from.arg) || i18next.t("OUTSIDE", {ns: rootI18nNs}),
-          to: sgcFormatter.format(to)
+          to: getSgcI18n(to)
         });
       }
 

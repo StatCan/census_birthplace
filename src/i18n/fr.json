@@ -2,7 +2,8 @@
 	"fr": {
 		"census_birthplace": {
 			"flow": "{{-from}} à {{-to}}",
-			"OUTSIDE": "Monde"
+			"OUTSIDE": "Monde",
+			"out_of_cma": "{{-sgc}} - à l'extérieur d'un RMR"
 		}
 	}
 }
