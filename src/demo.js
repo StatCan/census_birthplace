@@ -615,7 +615,7 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
           .attr("class", "hover_value");
       };
       sgcData = sgcs.sgcs;
-      sgcFormatter = sgc.getFormatter(sgcs, {type: false, province: false});
+      sgcFormatter = sgc.getFormatter(sgcs, {province: false});
       countriesData = statcan_countries(countries);
 
       fromSettings = $.extend(true, {}, baseSettings, fromSettings);
