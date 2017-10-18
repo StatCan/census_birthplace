@@ -420,13 +420,18 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   },
   fillResidenceSelect = function(pobData) {
     var $dest = $(window.dest || document.getElementById("dest")),
+      por = sgcData.filter(function(d) {
+        var id = d.sgcId;
+        if (id === canadaSgc || pobData.indexes[1].data.indexOf(id) === -1)
+          return false;
+        return true;
+      }).map(function(d) {
+        return d.sgcId;
+      }).sort(sgc.sortCW),
       s, id, text;
-    for (s = 0; s < sgcData.length; s++) {
-      id = sgcData[s].sgcId;
 
-      if (id === canadaSgc || pobData.indexes[1].data.indexOf(id) === -1)
-        continue;
-
+    for (s = 0; s < por.length; s++) {
+      id = por[s];
       text = sgcFormatter.format(id);
 
       $("<option></option>")
