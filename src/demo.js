@@ -94,7 +94,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         } else {
           if (
             isCanada ||
-            (toType === TO_CANADA && !isProvince) ||
+            (toType === TO_CANADA && isProvince) ||
             (toType === TO_PT && (isProvince || isCanada || (toId.indexOf(outsideCMASuffix) !== -1 && toId.substr(0, 2) !== toArg) || (toId.length == 3 && sgc.sgc.getProvince(toId) !== toArg))) ||
             (toType === TO_CMA && toId !== toArg) ||
             (fromType === FROM_WORLD && from !== allGeoId) ||
@@ -132,6 +132,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         dataLength = data.length,
         chartName = sett.name,
         fromType = sett.from.type,
+        toType = sett.to.type,
         topLevel = [],
         tos = [],
         froms = [],
@@ -159,7 +160,9 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
             return from;
         },
         getToParent = function(to) {
-          return to;
+          if (toType !== TO_CANADA)
+            return to;
+          return sgc.sgc.getProvince(to.replace(outsideCMASuffix, ""));
         },
         m, matrix, t;
 
@@ -268,11 +271,11 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         return d.index;
       },
       getClass: function(d) {
-        var cl = "";
-        if (typeof d.index === "string" && d.index !== "OUTSIDE") {
-          cl = getToClass(d.index);
-        }
+        var cl;
+        if (typeof d.index !== "string" || d.index === "OUTSIDE")
+          return null;
 
+        cl = getToClass(d.index);
         if (d.endAngle - d.startAngle < 0.4) {
           cl += " " + hiddenClass;
         }
@@ -289,7 +292,8 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         return d.target.category;
       },
       getClass: function(d) {
-        return getToClass(d.source.index);
+        if (typeof d.source.index === "string" && d.source.index !== "OUTSIDE")
+          return getToClass(d.source.index);
       }
     }
   },
