@@ -554,6 +554,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         show.to.type = TO_PT;
       }
       show.to.arg = id;
+      document.getElementById("dest").value=id;
     }
     showData();
   },
