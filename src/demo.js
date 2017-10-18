@@ -513,6 +513,8 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       classes = target.parentNode.className.baseVal.split(" "),
       id, type;
 
+    document.getElementById("pob").value=classes[0];
+
     if (target.ownerSVGElement.id === fromId) {
       id = classes[0];
       type = classes[1];
