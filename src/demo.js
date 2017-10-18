@@ -522,7 +522,11 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       classes = target.parentNode.className.baseVal.split(" "),
       id, type;
 
-    document.getElementById("pob").value=classes[0];
+      //TODO Ensure that the following is following the d3.js standards
+      var patt = new RegExp("^sgc_*");
+       if (!(patt.test(classes[0]))){
+         document.getElementById("pob").value=classes[0];
+       }
 
     if (target.ownerSVGElement.id === fromId) {
       id = classes[0];
