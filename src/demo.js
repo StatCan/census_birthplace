@@ -293,7 +293,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       },
       getClass: function(d) {
         if (typeof d.source.index === "string" && d.source.index !== "OUTSIDE")
-          return getToClass(d.source.index);
+          return getToClass(d.source.category);
       }
     }
   },
@@ -445,28 +445,32 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     }
   },
   onMouseOver = function(e) {
-    var hoverClass = "hovering",
-      obj;
+    var chart = e.target.ownerSVGElement,
+      hoverClass = "hovering",
+      obj, d3Chart, selector;
     clearTimeout(hoverTimeout);
     switch (e.type) {
     case "mouseover":
       obj = d3.select(e.target.parentNode).data()[0];
-      fromChart.select(".data").classed("hover", true);
-      fromChart.selectAll("." + hoverClass).classed(hoverClass, false);
+      d3Chart = d3.select(chart);
+      d3Chart.select(".data").classed("hover", true);
+      d3Chart.selectAll("." + hoverClass).classed(hoverClass, false);
       d3.select(e.target.parentNode).classed(hoverClass, true);
+
       if (obj.source) {
-        d3.select("." + obj.source.index.id).classed(hoverClass, true);
+        selector = "." + (chart.id === fromId ? obj.source.index.id : "sgc_" + obj.source.index);
+        d3.select(selector).classed(hoverClass, true);
       }
       break;
     case "mouseout":
       hoverTimeout = setTimeout(function() {
-        $("#" + fromId + " .data").trigger("mouseout");
+        $("#" + chart.id + " .data").trigger("mouseout");
       }, 100);
       return false;
     }
   },
-  onMouseOut = function() {
-    fromChart.select(".data").classed("hover", false);
+  onMouseOut = function(e) {
+    d3.select(e.target.ownerSVGElement).select(".data").classed("hover", false);
   },
   onMouseOverText = function(e) {
     var d = d3.select(e.target).datum(),
@@ -637,8 +641,8 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
 
       getImmigrationPeriod(0);
 
-      $(document).on("mouseover mouseout", "#canada_birthplace_from path", onMouseOver);
-      $(document).on("mouseout", "#canada_birthplace_from .data", onMouseOut);
+      $(document).on("mouseover mouseout", ".birthplace svg path", onMouseOver);
+      $(document).on("mouseout", ".birthplace svg .data", onMouseOut);
       $(document).on("mouseover", ".birthplace svg path", onMouseOverText);
       $(document).on("click", ".birthplace svg .arcs path", onClick);
       $(document).on("change", ".birthplace", onSelect);
