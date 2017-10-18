@@ -446,9 +446,10 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   },
   onMouseOver = function(e) {
     var chart = e.target.ownerSVGElement,
+      chartId = chart.id,
       hoverClass = "hovering",
       obj, d3Chart, selector;
-    clearTimeout(hoverTimeout);
+    clearTimeout(hoverTimeout[chartId]);
     switch (e.type) {
     case "mouseover":
       obj = d3.select(e.target.parentNode).data()[0];
@@ -458,13 +459,13 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       d3.select(e.target.parentNode).classed(hoverClass, true);
 
       if (obj.source) {
-        selector = "." + (chart.id === fromId ? obj.source.index.id : "sgc_" + obj.source.index);
+        selector = "." + (chartId === fromId ? obj.source.index.id : "sgc_" + obj.source.index);
         d3.select(selector).classed(hoverClass, true);
       }
       break;
     case "mouseout":
-      hoverTimeout = setTimeout(function() {
-        $("#" + chart.id + " .data").trigger("mouseout");
+      hoverTimeout[chartId] = setTimeout(function() {
+        $("#" + chartId + " .data").trigger("mouseout");
       }, 100);
       return false;
     }
@@ -608,7 +609,8 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   },
   immStatus = "total",
   birthplaceData = Array(immigrationPeriodCount),
-  countriesData, sgcData, sgcFormatter, hoverTimeout, oldState;
+  hoverTimeout = {},
+  countriesData, sgcData, sgcFormatter, oldState;
 
 i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
   d3.queue()
