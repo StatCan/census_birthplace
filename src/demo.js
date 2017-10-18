@@ -25,6 +25,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   oceaniaId = "CONT_OC",
   allGeoId = "OUTSIDE",
   outsideCMASuffix = "-x-nie",
+  hiddenClass = "text-hidden",
   immigrationPeriodCount = 7,
   getAngleFn = function(angleProp) {
     return function(d) {
@@ -233,12 +234,14 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           d.index;
         }
 
+        if (d.endAngle - d.startAngle < 0.4) {
+          cl += " " + hiddenClass;
+        }
+
         return cl;
       },
       getText: function(d) {
-        if (d.endAngle - d.startAngle > 0.4) {
-          return typeof d.index === "object" ? getCountryI18n(d.index.id, d.index.type) : "";
-        }
+        return typeof d.index === "object" ? getCountryI18n(d.index.id, d.index.type) : "";
       }
     },
     ribbons: {
@@ -265,17 +268,20 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         return d.index;
       },
       getClass: function(d) {
-        var cl;
+        var cl = "";
         if (typeof d.index === "string" && d.index !== "OUTSIDE") {
-          return getToClass(d.index);
+          cl = getToClass(d.index);
+        }
+
+        if (d.endAngle - d.startAngle < 0.4) {
+          cl += " " + hiddenClass;
         }
 
         return cl;
       },
       getText: function(d) {
-        if (d.endAngle - d.startAngle > 0.4) {
+        if (typeof d.index === "string" && d.index !== "OUTSIDE")
           return getSgcI18n(d.index);
-        }
       }
     },
     ribbons: {
