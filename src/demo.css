@@ -18,6 +18,11 @@ form.well {
 .arcs text {
 	font-size: 16px;
 	pointer-events: none;
+  transition: opacity 1s
+}
+
+.text-hidden text {
+  opacity: 0;
 }
 
 .CONT_AM path {
