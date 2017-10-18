@@ -392,7 +392,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       },
       c, continent, r, region;
 
-    $pob.find("option:gt(0)").remove();
+  //Fix for Issue #3:  $pob.find("option:gt(0)").remove();
 
     for (c = 0; c < countriesData.continents.length; c++) {
       continent = countriesData.continents[c];
