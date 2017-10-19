@@ -522,12 +522,6 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       classes = target.parentNode.className.baseVal.split(" "),
       id, type;
 
-      //TODO Ensure that the following is following the d3.js standards
-      var patt = new RegExp("^sgc_*");
-       if (!(patt.test(classes[0]))){
-         document.getElementById("pob").value=classes[0];
-       }
-
     if (target.ownerSVGElement.id === fromId) {
       id = classes[0];
       type = classes[1];
@@ -547,6 +541,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           show.from.type = FROM_COUNTRY;
         }
         show.from.arg = id;
+        document.getElementById("pob").value = classes[0];
       }
     } else {
       id = classes[0].replace("sgc_", "");
@@ -554,7 +549,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         show.to.type = TO_PT;
       }
       show.to.arg = id;
-      document.getElementById("dest").value=id;
+      document.getElementById("dest").value = id;
     }
     showData();
   },
