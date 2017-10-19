@@ -547,6 +547,8 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       id = classes[0].replace("sgc_", "");
       if (show.to.type === TO_CANADA) {
         show.to.type = TO_PT;
+      } else if (show.to.type === TO_PT) {
+        show.to.type = TO_CMA;
       }
       show.to.arg = id;
       document.getElementById("dest").value = id;
