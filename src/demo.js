@@ -528,7 +528,10 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         .text(text);
 
       svg.select(".hover_value")
-        .text(value);
+        .text(i18next.t("immigrants", {
+          ns: rootI18nNs,
+          num: value
+        }));
     }
   },
   clearMouseOverText = function() {

@@ -4,6 +4,7 @@
 			"pob_heading": "Place of birth outside Canada",
 			"por_heading": "Place of residence",
 			"flow": "{{-from}} to {{-to}}",
+			"immigrants": "{{num}} immigrants",
 			"OUTSIDE": "World",
 			"out_of_cma": "{{-sgc}} - Outside of a CMA",
 			"no-imm": "No immigration from the specified filters"
