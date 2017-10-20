@@ -3,7 +3,8 @@ form.well {
 }
 
 .data-group {
-	position:relative
+	margin-top: 1em;
+	position:relative;
 }
 
 .data-group .no-imm-msg {
@@ -21,6 +22,10 @@ form.well {
 
 .no-imm .arcs path {
 	stroke-width: 0;
+}
+
+text.h2 {
+	text-anchor: middle;
 }
 
 .arcs path {

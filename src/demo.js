@@ -63,9 +63,9 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     return cl;
   },
   baseSettings = {
-    aspectRatio: 1,
+    aspectRatio: 1.1,
     margin: {
-      top: 20
+      top: 60
     },
     filterData: function(data) {
       var sett = this,
@@ -637,19 +637,29 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
     .defer(d3.json, countriesDataUrl)
     .await(function(error, sgcs, countries) {
       var createHover = function(svg) {
-        var hoverText = svg.append("text")
-          .attr("class", "hover")
-          .attr("aria-hidden", "true");
+          var hoverText = svg.append("text")
+            .attr("class", "hover")
+            .attr("y", "2em")
+            .attr("aria-hidden", "true");
 
-        hoverText.append("tspan")
-          .attr("dy", "1em")
-          .attr("class", "hover_from");
+          hoverText.append("tspan")
+            .attr("dy", "1em")
+            .attr("class", "hover_from");
 
-        hoverText.append("tspan")
-          .attr("x", 0)
-          .attr("dy", "1.5em")
-          .attr("class", "hover_value");
-      };
+          hoverText.append("tspan")
+            .attr("x", 0)
+            .attr("dy", "1.5em")
+            .attr("class", "hover_value");
+        },
+        createHeading = function(svg, text) {
+          svg.append("text")
+            .attr("dy", "1em")
+            .attr("class", "h2")
+            .attr("x", function() {
+              return this.ownerSVGElement.width.baseVal.value;
+            })
+            .text(text);
+        };
       sgcData = sgcs.sgcs;
       sgcFormatter = sgc.getFormatter(sgcs, {province: false});
       countriesData = statcan_countries(countries);
@@ -659,6 +669,9 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
 
       noImmTextbox = dataGroup.append("p")
         .attr("class", "no-imm-msg h3");
+
+      createHeading(fromChart, i18next.t("pob_heading", {ns: rootI18nNs}));
+      createHeading(toChart, i18next.t("por_heading", {ns: rootI18nNs}));
 
       createHover(fromChart);
       createHover(toChart);

@@ -1,6 +1,8 @@
 {
 	"fr": {
 		"census_birthplace": {
+			"pob_heading": "Lieu de naissance à l'extérieur du Canada",
+			"por_heading": "Lieu de résidence",
 			"flow": "{{-from}} à {{-to}}",
 			"OUTSIDE": "Monde",
 			"out_of_cma": "{{-sgc}} - à l'extérieur d'un RMR",
