@@ -95,7 +95,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           if (
             isCanada ||
             (toType === TO_CANADA && isProvince) ||
-            (toType === TO_PT && (isProvince || isCanada || (toId.indexOf(outsideCMASuffix) !== -1 && toId.substr(0, 2) !== toArg) || (toId.length == 3 && sgc.sgc.getProvince(toId) !== toArg))) ||
+            (toType === TO_PT && (isProvince || isCanada || (toId.indexOf(outsideCMASuffix) !== -1 && toId.substr(0, 2) !== toArg) || ((toId.length === 3 || toId.length == 5) && sgc.sgc.getProvince(toId) !== toArg))) ||
             (toType === TO_CMA && toId !== toArg) ||
             (fromType === FROM_WORLD && from !== allGeoId) ||
             (fromType === FROM_OCEANIA && from.id !== oceaniaId) ||
