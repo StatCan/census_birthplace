@@ -20,12 +20,14 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   toContainer = d3.select(".birthplace .data.to"),
   toChart = toContainer.append("svg")
     .attr("id", "canada_birthplace_to"),
+  dataGroup = d3.select(".data-group"),
   rootI18nNs = "census_birthplace",
   canadaSgc = "01",
   oceaniaId = "CONT_OC",
   allGeoId = "OUTSIDE",
   outsideCMASuffix = "-x-nie",
   hiddenClass = "text-hidden",
+  noImmClass = "no-imm",
   immigrationPeriodCount = 7,
   getAngleFn = function(angleProp) {
     return function(d) {
@@ -70,42 +72,56 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         toType = sett.to.type,
         toArg = sett.to.arg,
         fromType = sett.from.type,
-        fromArg = sett.from.arg;
+        fromArg = sett.from.arg,
+        filtered = data.filter(function(d) {
+          var toId = sett.to.getValue.call(sett, d),
+            isCanada = toId === canadaSgc,
+            isProvince = sgc.sgc.isProvince(toId),
+            from = sett.from.getValue.call(sett, d),
+            fromRegion = from.type === "region",
+            fromCountry = from.type === "country";
 
-      return data.filter(function(d) {
-        var toId = sett.to.getValue.call(sett, d),
-          isCanada = toId === canadaSgc,
-          isProvince = sgc.sgc.isProvince(toId),
-          from = sett.from.getValue.call(sett, d),
-          fromRegion = from.type === "region",
-          fromCountry = from.type === "country";
-
-        if (sett.name === "from") {
           if (
-            (toType === TO_CANADA && !isCanada) ||
-            ((toType === TO_PT || toType === TO_CMA) && toId !== toArg) ||
-            (fromType === FROM_WORLD && (!fromRegion && from.id !== oceaniaId)) ||
-            (fromType === FROM_CONTINENT && (!fromCountry || !from.region || from.region.continent.id !== fromArg)) ||
-            (fromType === FROM_OCEANIA && (!fromCountry || !from.continent || from.continent.id !== oceaniaId)) ||
-            (fromType === FROM_REGION && (!fromCountry || !from.region || from.region.id !== fromArg)) ||
-            (fromType === FROM_COUNTRY && (!fromCountry || from.id !== fromArg))
-          )
-            return false;
-        } else {
-          if (
-            isCanada ||
-            (toType === TO_CANADA && isProvince) ||
-            (toType === TO_PT && (isProvince || isCanada || (toId.indexOf(outsideCMASuffix) !== -1 && toId.substr(0, 2) !== toArg) || ((toId.length === 3 || toId.length == 5) && sgc.sgc.getProvince(toId) !== toArg))) ||
-            (toType === TO_CMA && toId !== toArg) ||
-            (fromType === FROM_WORLD && from !== allGeoId) ||
-            (fromType === FROM_OCEANIA && from.id !== oceaniaId) ||
-            (fromType !== FROM_WORLD && fromType !== FROM_OCEANIA && from.id !== fromArg)
-          )
-            return false;
-        }
+            sett.name === "from" &&
+            ((show.from.arg === null && from === allGeoId) || (show.from.arg !== null && from.id === show.from.arg)) &&
+            ((show.to.arg === null && toId === canadaSgc) || (show.to.arg !== null && toId === show.to.arg)) &&
+            !sett.getPointValue.call(sett, d)
+          ) {
+            // No immigration
+            noImmTextbox.text(i18next.t("no-imm", {
+              ns: rootI18nNs
+            }));
+            dataGroup.classed(noImmClass, true);
+          }
 
-        return true;
-      });
+          if (sett.name === "from") {
+            if (
+              (toType === TO_CANADA && !isCanada) ||
+              ((toType === TO_PT || toType === TO_CMA) && toId !== toArg) ||
+              (fromType === FROM_WORLD && (!fromRegion && from.id !== oceaniaId)) ||
+              (fromType === FROM_CONTINENT && (!fromCountry || !from.region || from.region.continent.id !== fromArg)) ||
+              (fromType === FROM_OCEANIA && (!fromCountry || !from.continent || from.continent.id !== oceaniaId)) ||
+              (fromType === FROM_REGION && (!fromCountry || !from.region || from.region.id !== fromArg)) ||
+              (fromType === FROM_COUNTRY && (!fromCountry || from.id !== fromArg))
+            )
+              return false;
+          } else {
+            if (
+              isCanada ||
+              (toType === TO_CANADA && isProvince) ||
+              (toType === TO_PT && (isProvince || isCanada || (toId.indexOf(outsideCMASuffix) !== -1 && toId.substr(0, 2) !== toArg) || ((toId.length === 3 || toId.length == 5) && sgc.sgc.getProvince(toId) !== toArg))) ||
+              (toType === TO_CMA && toId !== toArg) ||
+              (fromType === FROM_WORLD && from !== allGeoId) ||
+              (fromType === FROM_OCEANIA && from.id !== oceaniaId) ||
+              (fromType !== FROM_WORLD && fromType !== FROM_OCEANIA && from.id !== fromArg)
+            )
+              return false;
+          }
+
+          return true;
+        });
+
+      return filtered;
     },
     from: {
       getValue: function(d) {
@@ -272,7 +288,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       },
       getClass: function(d) {
         var cl;
-        if (typeof d.index !== "string" || d.index === "OUTSIDE")
+        if (typeof d.index !== "string" || d.index === allGeoId)
           return null;
 
         cl = getToClass(d.index);
@@ -283,7 +299,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         return cl;
       },
       getText: function(d) {
-        if (typeof d.index === "string" && d.index !== "OUTSIDE")
+        if (typeof d.index === "string" && d.index !== allGeoId)
           return getSgcI18n(d.index);
       }
     },
@@ -292,7 +308,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         return d.target.category;
       },
       getClass: function(d) {
-        if (typeof d.source.index === "string" && d.source.index !== "OUTSIDE")
+        if (typeof d.source.index === "string" && d.source.index !== allGeoId)
           return getToClass(d.source.category);
       }
     }
@@ -371,6 +387,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       oldState = str;
     }
     clearMouseOverText();
+    dataGroup.classed(noImmClass, false);
     chordChart(fromChart, fromSettings);
     chordChart(toChart, toSettings);
   },
@@ -502,7 +519,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         }
         text = i18next.t("flow", {
           ns: rootI18nNs,
-          from: getCountryI18n(show.from.arg) || i18next.t("OUTSIDE", {ns: rootI18nNs}),
+          from: getCountryI18n(show.from.arg) || i18next.t(allGeoId, {ns: rootI18nNs}),
           to: getSgcI18n(to)
         });
       }
@@ -612,7 +629,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   immStatus = "total",
   birthplaceData = Array(immigrationPeriodCount),
   hoverTimeout = {},
-  countriesData, sgcData, sgcFormatter, oldState;
+  countriesData, sgcData, sgcFormatter, oldState, noImmTextbox;
 
 i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
   d3.queue()
@@ -639,6 +656,9 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
 
       fromSettings = $.extend(true, {}, baseSettings, fromSettings);
       toSettings = $.extend(true, {}, baseSettings, toSettings);
+
+      noImmTextbox = dataGroup.append("p")
+        .attr("class", "no-imm-msg h3");
 
       createHover(fromChart);
       createHover(toChart);

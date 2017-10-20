@@ -2,6 +2,27 @@ form.well {
 	margin: 0px;
 }
 
+.data-group {
+	position:relative
+}
+
+.data-group .no-imm-msg {
+	display: none;
+	position: absolute;
+	text-align: center;
+	top: 50%;
+	vertical-align: middle;
+	width: 100%;
+}
+
+.no-imm .no-imm-msg {
+	display: block;
+}
+
+.no-imm .arcs path {
+	stroke-width: 0;
+}
+
 .arcs path {
 	fill: #ffdd89;
 	stroke: #000;
