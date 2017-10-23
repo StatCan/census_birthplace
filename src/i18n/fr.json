@@ -7,7 +7,7 @@
 			"immigrants": "{{num}} immigrants",
 			"OUTSIDE": "Monde",
 			"out_of_cma": "{{-sgc}} - à l'extérieur d'un RMR",
-			"no-imm": "Pas d'immigration selon les filtres spécifiés"
+			"no-imm": "Aucune donnée disponible pour les filtres sélectionnés."
 		}
 	}
 }
