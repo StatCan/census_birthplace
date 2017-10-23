@@ -390,7 +390,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     clearMouseOverText();
     dataGroup.classed(noImmClass, false);
     chordChart(fromChart, fromSettings);
-    chordChart(toChart, toSettings);
+    console.log(chordChart(toChart, toSettings));
   },
 
   fillPobSelect = function(pobData) {
@@ -660,9 +660,7 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
             .attr("dy", "1em")
             .attr("class", "h2")
             .attr("aria-hidden", "true")
-            .attr("x", function() {
-              return this.ownerSVGElement.width.baseVal.value;
-            })
+            .attr("x", 300)
             .text(text);
         };
       sgcData = sgcs.sgcs;
