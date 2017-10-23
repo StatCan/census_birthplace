@@ -606,6 +606,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
 
       if (id === canadaSgc) {
         show.to.type = TO_CANADA;
+        show.to.arg = null;
       } else {
         show.to.arg = id;
         show.to.type = sgc.sgc.isProvince(show.to.arg) ? TO_PT : TO_CMA;
