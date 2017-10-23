@@ -29,6 +29,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   hiddenClass = "text-hidden",
   noImmClass = "no-imm",
   immigrationPeriodCount = 7,
+  valueFormatter = i18n.getNumberFormatter(0),
   getAngleFn = function(angleProp) {
     return function(d) {
       return d[angleProp] - Math.PI;
@@ -530,7 +531,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       svg.select(".hover_value")
         .text(i18next.t("immigrants", {
           ns: rootI18nNs,
-          num: value
+          num: valueFormatter.format(value)
         }));
     }
   },
