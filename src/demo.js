@@ -390,7 +390,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     clearMouseOverText();
     dataGroup.classed(noImmClass, false);
     chordChart(fromChart, fromSettings);
-    console.log(chordChart(toChart, toSettings));
+    chordChart(toChart, toSettings);
   },
 
   fillPobSelect = function(pobData) {
