@@ -658,6 +658,7 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
           svg.append("text")
             .attr("dy", "1em")
             .attr("class", "h2")
+            .attr("aria-hidden", "true")
             .attr("x", function() {
               return this.ownerSVGElement.width.baseVal.value;
             })
