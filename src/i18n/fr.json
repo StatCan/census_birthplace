@@ -6,7 +6,7 @@
 			"flow": "{{-from}} à {{-to}}",
 			"immigrants": "{{num}} immigrants",
 			"OUTSIDE": "Monde",
-			"out_of_cma": "{{-sgc}} - à l'extérieur d'un RMR",
+			"out_of_cma": "{{-sgc}} - à l'extérieur d'une RMR",
 			"no-imm": "Aucune donnée disponible pour les filtres sélectionnés."
 		}
 	}
