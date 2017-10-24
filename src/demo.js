@@ -26,7 +26,6 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
   oceaniaId = "CONT_OC",
   allGeoId = "OUTSIDE",
   outsideCMASuffix = "-x-nie",
-  hiddenClass = "text-hidden",
   noImmClass = "no-imm",
   immigrationPeriodCount = 7,
   valueFormatter = i18n.getNumberFormatter(0),
@@ -385,7 +384,8 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
 
   fillPobSelect = function(pobData) {
     var pobs = pobData.indexes[0].data,
-      $pob = $(window.pob || document.getElementById("pob")),
+      pob = window.pob || document.getElementById("pob"),
+      $pob = $(pob),
       createOption = function(id, type) {
         var text = getCountryI18n(id, type);
 
@@ -408,9 +408,10 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           }
         }
       },
-      c, continent, r, region;
+      c, continent, r, region, value;
 
-  //Fix for Issue #3:  $pob.find("option:gt(0)").remove();
+    value = pob.value;
+    $pob.find("option:gt(0)").remove();
 
     for (c = 0; c < countriesData.continents.length; c++) {
       continent = countriesData.continents[c];
@@ -429,9 +430,13 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         loopCountries(continent);
       }
     }
+    if (value !== undefined) {
+      pob.value = value;
+    }
   },
   fillResidenceSelect = function(pobData) {
-    var $dest = $(window.dest || document.getElementById("dest")),
+    var dest = window.dest || document.getElementById("dest"),
+      $dest = $(dest),
       por = sgcData.filter(function(d) {
         var id = d.sgcId;
         if (id === canadaSgc || pobData.indexes[1].data.indexOf(id) === -1)
@@ -440,8 +445,10 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
       }).map(function(d) {
         return d.sgcId;
       }).sort(sgc.sortCW),
-      s, id, text;
+      s, id, text, value;
 
+    value = dest.value;
+    $dest.find("option:gt(0)").remove();
     for (s = 0; s < por.length; s++) {
       id = por[s];
       text = sgcFormatter.format(id);
@@ -450,6 +457,9 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         .attr("value", id)
         .html(text)
         .appendTo($dest);
+    }
+    if (value !== undefined) {
+      dest.value = value;
     }
   },
   onMouseOver = function(e) {
