@@ -1,11 +1,11 @@
 {
 	"fr": {
 		"census_birthplace": {
-			"pob_heading": "Lieu de naissance à l'extérieur du Canada",
+			"pob_heading": "Lieu de naissance",
 			"por_heading": "Lieu de résidence",
 			"flow": "{{-from}} à {{-to}}",
 			"immigrants": "{{num}} immigrants",
-			"OUTSIDE": "Monde",
+			"OUTSIDE": "Extérieur du Canada",
 			"out_of_cma": "{{-sgc}} - à l'extérieur d'une RMR",
 			"no-imm": "Aucune donnée disponible pour les filtres sélectionnés."
 		}
