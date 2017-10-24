@@ -88,14 +88,18 @@ this.chordChart = function(svg, settings) {
           };
         },
         textFit = function(d) {
-          var text = d3.select(this).text(),
-            textLength, angle, circumference;
+          var textObj = d3.select(this),
+            text = textObj.text(),
+            textInnerHtml, textLength, angle, circumference;
 
           if (text !== "") {
+            textInnerHtml = textObj.html();
+            textObj.text(text);
             textLength = this.getSubStringLength(0, text.length);
+            textObj.html(textInnerHtml);
             angle = (d.endAngle - d.startAngle) / (2 * Math.PI);
             circumference = angle * 2 * Math.PI * innerDiameter / 2;
-console.log([text, textLength, circumference])
+
             return textLength < circumference;
           }
 
@@ -187,16 +191,10 @@ console.log([text, textLength, circumference])
       arcs
         .attr("class", arcsClass)
         .each(function() {
-          var parent = d3.select(this),
-            textPath = parent.select("textPath"),
-            ref = textPath.attr("href");
-
-          textPath.attr("href", "");
+          var parent = d3.select(this);
 
           parent.select("text")
             .style("opacity", hiddenText);
-
-          textPath.attr("href", ref);
 
           parent.select("path")
             .transition(transition)
