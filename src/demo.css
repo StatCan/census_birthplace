@@ -44,7 +44,6 @@ text.h2 {
 .arcs text {
 	font-size: 16px;
 	pointer-events: none;
-  transition: opacity 1s
 }
 
 .text-hidden text {

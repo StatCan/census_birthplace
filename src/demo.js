@@ -254,10 +254,6 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
           d.index;
         }
 
-        if (d.endAngle - d.startAngle < 0.4) {
-          cl += " " + hiddenClass;
-        }
-
         return cl;
       },
       getText: function(d) {
@@ -288,16 +284,10 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         return d.index;
       },
       getClass: function(d) {
-        var cl;
         if (typeof d.index !== "string" || d.index === allGeoId)
           return null;
 
-        cl = getToClass(d.index);
-        if (d.endAngle - d.startAngle < 0.4) {
-          cl += " " + hiddenClass;
-        }
-
-        return cl;
+        return getToClass(d.index);
       },
       getText: function(d) {
         if (typeof d.index === "string" && d.index !== allGeoId)
