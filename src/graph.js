@@ -90,13 +90,17 @@ this.chordChart = function(svg, settings) {
         textFit = function(d) {
           var textObj = d3.select(this),
             text = textObj.text(),
-            textInnerHtml, textLength, angle, circumference;
+            textPath, textLength, angle, circumference;
 
           if (text !== "") {
-            textInnerHtml = textObj.html();
+            textPath = textObj.select("textPath").remove();
             textObj.text(text);
             textLength = this.getSubStringLength(0, text.length);
-            textObj.html(textInnerHtml);
+            textObj
+              .text(null)
+              .insert(function() {
+                return textPath.node();
+              });
             angle = (d.endAngle - d.startAngle) / (2 * Math.PI);
             circumference = angle * 2 * Math.PI * innerDiameter / 2;
 
