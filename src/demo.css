@@ -30,14 +30,14 @@ text.h2 {
 
 .arcs path {
 	fill: #ffdd89;
-	stroke: #000;
+	stroke: #FFF;
 	stroke-width: 0.2;
 }
 
 .ribbons path {
 	fill: #ffdd89;
 	opacity: .85;
-	stroke: #000;
+	stroke: #FFF;
 	stroke-width: 0.2;
 }
 
@@ -63,27 +63,27 @@ text.h2 {
 }
 
 .CONT_AS path {
-	fill: #6fb20c;
+	fill: #51800A;
 }
 
 .CONT_OC path,
 .CONT_OC-ct path {
-	fill: #DE770E;
+	fill: #C9450D;
 }
 
 .AM-NA path,
 .AM-NA-ct path {
-	fill: #F00;
+	fill: #E60000;
 }
 
 .AM-CA path,
 .AM-CA-ct path {
-	fill: #ce0000;
+	fill: #BD0000;
 }
 
 .AM-CR path,
 .AM-CR-ct path {
-	fill: #960000;
+	fill: #8A0000;
 }
 
 .AM-SA path,
@@ -144,32 +144,32 @@ text.h2 {
 
 .AS-ME path,
 .AS-ME-ct path {
-	fill: #6fb20c;
+	fill: #218500;
 }
 
 .AS-EA path,
 .AS-EA-ct path {
-	fill: #609b09;
+	fill: #1B6B00;
 }
 
 .AS-SE path,
 .AS-SE-ct path {
-	fill: #4f7f07;
+	fill: #165700;
 }
 
 .AS-SA path,
 .AS-SA-ct path {
-	fill: #375905;
+	fill: #124700;
 }
 
 .sgc_10 path,
 .pt_10 path {
-	fill: #DE353A;
+	fill: #E35459;
 }
 
 .sgc_11 path,
 .pt_11 path {
-	fill: #980B85;
+	fill: #e357d0;
 }
 
 .sgc_12 path,
@@ -179,42 +179,42 @@ text.h2 {
 
 .sgc_13 path,
 .pt_13 path {
-	fill: #E36928;
+	fill: #F55A22;
 }
 
 .sgc_24 path,
 .pt_24 path {
-	fill: #42A62A;
+	fill: #7ED75A;
 }
 
 .sgc_35 path,
 .pt_35 path {
-	fill: #F8B334;
+	fill: #FFBB3D;
 }
 
 .sgc_46 path,
 .pt_46 path {
-	fill: #E4136F;
+	fill: #EC1371;
 }
 
 .sgc_47 path,
 .pt_47 path {
-	fill: #91117E;
+	fill: #D219B6;
 }
 
 .sgc_48 path,
 .pt_48 path {
-	fill: #E36928;
+	fill: #FF8B52;
 }
 
 .sgc_59 path,
 .pt_59 path {
-	fill: #0A71B4;
+	fill: #0C7ECA;
 }
 
 .sgc_60 path,
 .pt_60 path {
-	fill: #F8B334;
+	fill: #F8DC78;
 }
 
 .sgc_61 path,
@@ -224,7 +224,7 @@ text.h2 {
 
 .sgc_62 path,
 .pt_62 path {
-	fill: #0A71B4;
+	fill: #0EB8EC;
 }
 
 .hover  path {
