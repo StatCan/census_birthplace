@@ -1,7 +1,7 @@
 {
 	"en": {
 		"census_birthplace": {
-			"pob_heading": "Place of birth outside Canada",
+			"pob_heading": "Place of birth",
 			"por_heading": "Place of residence",
 			"flow": "{{-from}} to {{-to}}",
 			"immigrants": "{{num}} immigrants",
