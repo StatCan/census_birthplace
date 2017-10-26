@@ -470,15 +470,17 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
     clearTimeout(hoverTimeout[chartId]);
     switch (e.type) {
     case "mouseover":
-      obj = d3.select(e.target.parentNode).data()[0];
-      d3Chart = d3.select(chart);
-      d3Chart.select(".data").classed("hover", true);
-      d3Chart.selectAll("." + hoverClass).classed(hoverClass, false);
-      d3.select(e.target.parentNode).classed(hoverClass, true);
+      if (e.target.parentNode.className.baseVal !== "") {
+        obj = d3.select(e.target.parentNode).data()[0];
+        d3Chart = d3.select(chart);
+        d3Chart.select(".data").classed("hover", true);
+        d3Chart.selectAll("." + hoverClass).classed(hoverClass, false);
+        d3.select(e.target.parentNode).classed(hoverClass, true);
 
-      if (obj.source) {
-        selector = "." + (chartId === fromId ? obj.source.index.id : "sgc_" + obj.source.index);
-        d3.select(selector).classed(hoverClass, true);
+        if (obj.source) {
+          selector = "." + (chartId === fromId ? obj.source.index.id : "sgc_" + obj.source.index);
+          d3.select(selector).classed(hoverClass, true);
+        }
       }
       break;
     case "mouseout":
