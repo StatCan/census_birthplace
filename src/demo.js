@@ -508,7 +508,7 @@ var sgcI18nRoot = "lib/statcan_sgc/i18n/sgc/",
         text = i18next.t("flow", {
           ns: rootI18nNs,
           from: getCountryI18n(from.id, from.type),
-          to: sgcFormatter.format(show.to.arg || canadaSgc)
+          to: getSgcI18n(show.to.arg || canadaSgc)
         });
       } else {
         if (d.index) {
