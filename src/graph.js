@@ -184,7 +184,7 @@ this.chordChart = function(svg, settings) {
 
             textObj
               .append("textPath")
-              .attr("href", function() {
+              .attr("xlink:href", function() {
                 return "#" + arcId.apply(this, arguments);
               })
               .text(arcsText);
