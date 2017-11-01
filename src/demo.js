@@ -686,7 +686,7 @@ i18n.load([sgcI18nRoot, countryI18nRoot, rootI18nRoot], function() {
 
       $(document).on("mouseover mouseout", ".birthplace svg path", onMouseOver);
       $(document).on("mouseout", ".birthplace svg .data", onMouseOut);
-      $(document).on("mouseover", ".birthplace svg path", onMouseOverText);
+      $(document).on("mouseover click", ".birthplace svg path", onMouseOverText);
       $(document).on("click", ".birthplace svg .arcs path", onClick);
       $(document).on("change", ".birthplace", onSelect);
     });
