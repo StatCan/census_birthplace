@@ -29,12 +29,14 @@ text.h2 {
 }
 
 .arcs path {
+	cursor: pointer;
 	fill: #ffdd89;
 	stroke: #FFF;
 	stroke-width: 0.2;
 }
 
 .ribbons path {
+	cursor: pointer;
 	fill: #ffdd89;
 	opacity: .85;
 	stroke: #FFF;
