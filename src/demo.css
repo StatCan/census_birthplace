@@ -1,3 +1,7 @@
+.data svg > text {
+	fill: currentColor;
+}
+
 form.well {
 	margin: 0px;
 }
